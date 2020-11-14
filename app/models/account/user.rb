@@ -2,6 +2,7 @@ module Account
   class User < ApplicationRecord
     include ActiveModel::Validations
     self.table_name = 'users'
+    has_many :identifies, dependent: :destroy
 
     # Include default devise modules. Others available are:
     # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
@@ -14,8 +15,8 @@ module Account
      errors.add(:base, 'Must have phone or email') unless (phone? || email?)
     end
 
-    validates :email, uniqueness: { case_sensitive: false }
-    validates :phone, uniqueness: true
+    validates :email, uniqueness: { case_sensitive: false }, allow_nil: true, allow_blank: true
+    validates :phone, uniqueness: true, allow_nil: true, allow_blank: true
     validates_format_of :phone, with: /\A[0-9_+]*\z/
     # https://github.com/heartcombo/devise/wiki/How-To:-Allow-users-to-sign-in-using-their-username-or-email-address
     def phone?

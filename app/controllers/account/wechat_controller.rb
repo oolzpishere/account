@@ -3,13 +3,13 @@ module Account
   class WechatController < ::Account::ApplicationController
     # skip_before_action :verify_authenticity_token, :authenticate_user!
     # not authenticate_user! when callback to wechat.
-    skip_before_action :authenticate_user!
+
     before_action :get_info
     # set class vars after get_info success.
-    attr_reader :auth_info, :wechat_user_data, :raw_info, :provider, :openid , :unionid
+    attr_reader :auth_info, :wechat_user_info, :raw_info, :provider, :openid , :unionid
 
     def wechat
-      @wechat_user_data = auth_info.info  # https://github.com/skinnyworm/omniauth-wechat-oauth2
+      @wechat_user_info = auth_info.info  # https://github.com/skinnyworm/omniauth-wechat-oauth2
       @raw_info = auth_info.extra[:raw_info]
       @provider = auth_info.provider
       @openid = auth_info.uid
@@ -26,7 +26,9 @@ module Account
 
       # sign_in_and_redirect @user, :event => :authentication
       sign_in @user, :event => :authentication, scope: :user
-      redirect_to "/user"
+      # TODO: consider how to add this setting to difference App.
+      # 1. Add to initialze config file.
+      redirect_to "/user_views"
     end
 
     private
@@ -48,12 +50,12 @@ module Account
     # find user by unionid first.
     def find_identify
       identify = nil
-      unless unionid.empty?
+      unless unionid.blank?
         identify = Account::Identify.find_by(provider: provider, unionid: unionid)
         return identify if identify
       end
 
-      unless openid.empty?
+      unless openid.blank?
         identify = Account::Identify.find_by(provider: provider, uid: openid)
       end
       return identify
@@ -63,10 +65,10 @@ module Account
       i = Devise.friendly_token[0,20]
       # return nil, if create! fail
       new_user = Account::User.new(
-        username: wechat_user_data.nickname.to_s,
-        # username: data.nickname.to_s + "_" + rand(36 ** 3).to_s(36),
+        # username: wechat_user_info.nickname.to_s,
+        username: wechat_user_info.nickname.to_s + "_" + rand(36 ** 3).to_s(36),
         email:  "#{i}@sflx.com.cn",       # 因为devise 的缘故,邮箱暂做成随机
-        avatar: wechat_user_data.headimgurl,
+        avatar: wechat_user_info.headimgurl,
         password: i,                                              # 密码随机
         password_confirmation: i
       )
@@ -74,7 +76,7 @@ module Account
         redirect_to(login_path, alert: 'user保存错误')
         return false
       end
-      return false unless create_identify(user)
+      return false unless create_identify(new_user)
       new_user
     end
 
