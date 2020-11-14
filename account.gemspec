@@ -29,6 +29,10 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "sqlite3"
 
-  spec.add_dependency "devise"
-  
+  spec.add_dependency 'devise'
+  spec.add_dependency 'devise-i18n'
+
+  spec.add_dependency "omniauth"
+  spec.add_dependency "omniauth-wechat-oauth2"
+
 end
