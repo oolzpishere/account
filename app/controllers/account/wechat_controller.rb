@@ -28,7 +28,9 @@ module Account
       sign_in @user, :event => :authentication, scope: :user
       # TODO: consider how to add this setting to difference App.
       # 1. Add to initialze config file.
-      redirect_to "/user_views"
+      # TODO: redirect to session[devise_after_sign_in] || user home page.
+      # redirect_to "/user_views"
+      redirect_to after_sign_in_path_for(User)
     end
 
     private
@@ -73,6 +75,7 @@ module Account
         password_confirmation: i
       )
       unless new_user.save
+        # TODO: redirect_to login_path || root_path
         redirect_to(login_path, alert: 'user保存错误')
         return false
       end
@@ -88,6 +91,7 @@ module Account
         user_id: user.id
       )
       unless identify.save
+        # TODO: redirect_to login_path || root_path
         redirect_to(login_path, alert: 'identify保存错误')
         return false
       end
