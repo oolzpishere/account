@@ -1,0 +1,32 @@
+
+
+<div class="container px-0 pb-3 grey lighten-4">
+
+  <div class="row no-gutters py-2 ">
+    <div class="col">
+      <%= form_with(url: account.check_verification_code_path, local: true) do |form| %>
+
+        <div id="phone_details">
+          <%= form.label "手机号码 ", class: 'control-label', id: 'verify_phone_label' %>
+          <%= form.text_field  :verification_phone, id: 'verification_phone' ,:class => "{mask:'(0569) 9999999'}" %>
+          <%= link_to '发送验证码', "#", :id=> 'sendverification', :class=> 'btn btn-sm btn-success' %>
+          <%= form.label "", class: 'control-label', id: 'error_mobile_label' %>
+        </div>
+
+        <div id="verification_details">
+          <%= form.label "验证码 ", class: 'control-label', id: 'verify_code_label' , style:"display:none" %>
+          <%= form.text_field :verification_code, placeholder: 'XXXXXX', id: 'verification_code' ,:class => "{mask:'999999'}", :alt=> "999999'" %>
+          <%= form.label "", class: 'control-label', id: 'error_code_label' %>
+          <%= form.label "", class: 'control-label', id: 'success_code_label' %>
+        </div>
+
+        <div class="actions">
+          <%= form.submit "登录", class: "btn deep-orange text-white"%>
+        </div>
+      <% end %>
+    </div>
+
+
+  </div>
+
+</div>

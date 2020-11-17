@@ -29,11 +29,18 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "sqlite3"
 
+  spec.add_dependency 'jquery-rails'
+  # spec.add_dependency 'jquery-ui-rails'
+  # spec.add_dependency 'jquery-fileupload-rails'
+  spec.add_dependency 'bootstrap'
+
   spec.add_dependency 'devise'
   spec.add_dependency 'devise-i18n'
-  # spec.add_dependency 'active_model_otp'
+  spec.add_dependency 'active_model_otp'
 
   spec.add_dependency "omniauth"
   spec.add_dependency "omniauth-wechat-oauth2"
 
+  spec.add_dependency 'qcloud-sms', "~> 1.0.1"
+  spec.add_dependency 'aliyun-sms'
 end
