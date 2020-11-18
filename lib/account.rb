@@ -10,6 +10,12 @@ require "omniauth-wechat-oauth2"
 
 require 'qcloud/sms'
 require 'aliyun/sms'
+
 module Account
-  # Your code goes here...
+
+  class<< self
+    attr_accessor :login_corp_name
+
+  end
+
 end

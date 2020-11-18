@@ -39,14 +39,17 @@ $(document).on("ready page:load turbolinks:load", function() {
 
   $("#sendverification").click(function() {
     var time, seconds, phone_string;
-    
-    function isValidePhone(phone_string) {
-      return(phone_string.length === 11);
-    }
 
     phone_string = $("#verification_phone").val();
 
-    if ( !isValidePhone( phone_string ) ) {
+    function isAValidePhone(phone_string) {
+      return(phone_string.length === 11);
+    }
+
+    if ( !isAValidePhone( phone_string ) ) {
+      $("#verification_phone").addClass( "is-invalid" );
+      $("#error_mobile_label").addClass( "invalid-feedback" );
+      $("#error_mobile_label").text('号码格式不正确，请重新输入11位数字');
       return false;
     }
 
@@ -70,7 +73,6 @@ $(document).on("ready page:load turbolinks:load", function() {
         } else {
           // $("#error_mobile_label").text('shared.navbar.problem_sending_sms'.show());
           $("#error_mobile_label").text('shared.navbar.problem_sending_sms');
-
         }
       },
       error: function(data) {

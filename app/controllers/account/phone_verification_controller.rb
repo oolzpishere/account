@@ -1,8 +1,8 @@
 module Account
-  class PhoneVerificationController < ActionController::Base
+  class PhoneVerificationController < Account::ApplicationController
     protect_from_forgery only: []
     # skip_before_action :authenticate_user!
-    layout "account/application.html.erb"
+    # layout "account/application.html.erb"
 
     DRIFT_MINUTES = 5
 
