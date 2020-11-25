@@ -11,9 +11,12 @@ module Account
     end
 
     def check_verification_code
-      data = {:result => false}
+      #d data = {:result => false}
       phone = validate_phone(params[:verification_phone])
-      return false unless user = user_find_by_phone(phone)
+      unless user = user_find_by_phone(phone)
+        redirect_to(phone_login_path, alert: '此号码未注册用户，请重新填写')
+        return false
+      end
       # default otp-code available for 30 second, drift: 60, is add 60 second more available time.
       # drift 5 minutes.
       if user.authenticate_otp(params[:verification_code], drift: (60 * DRIFT_MINUTES))
@@ -28,7 +31,16 @@ module Account
 
     def sendverification
       data = {:result => false}
-      phone = validate_phone(params[:verification_code])
+      phone = validate_phone(params[:verification_phone])
+      # TODO:  if verification user == false
+      # then skip find user.
+      unless user = user_find_by_phone(phone)
+        data[:error_message] = '此号码未注册用户，请重新填写'
+        respond_to do |format|
+          format.json  { render :json => data }
+        end
+        return
+      end
       if phone.present?
         # 验证码：{1}，此验证码{2}分钟内有效，请尽快完成验证。 提示：请勿泄露验证码给他人
         params = [user_find_by_phone(phone).otp_code.to_s, DRIFT_MINUTES.to_s]
@@ -48,14 +60,16 @@ module Account
       #   params.fetch(:order, {}).permit(:verification_phone, :verification_code, :password, :password_confirmation)
       # end
 
-
+      def phone_login_path
+        account.phone_verification_new_path
+      end
 
       def user_find_by_phone(phone)
         Account::User.find_by(phone: phone) if validate_phone(phone)
       end
 
       def validate_phone(phone)
-        phone.match(/^[0-9]{11}$/) ? phone : false
+        (phone && phone.match(/^[0-9]{11}$/)) ? phone : false
       end
 
   end

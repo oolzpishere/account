@@ -1,3 +1,4 @@
 Rails.application.routes.draw do
-  mount Account::Engine => "/account"
+  mount Account::Engine   => '/', as: 'account'
+
 end

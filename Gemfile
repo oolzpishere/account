@@ -13,3 +13,28 @@ gemspec
 
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
+
+group :development, :test do
+  # Use Puma as the app server
+  gem 'puma', '~> 3.11'
+
+  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
+  gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
+  gem 'pry'
+
+  gem 'capybara'
+  # download the exact version with your chromebrowser, don't user gem:webdriver.
+  gem 'selenium-webdriver'
+
+  gem 'rspec-rails'
+  # guard detect chang need gem install rb-fsevent
+  # gem 'guard-rspec', require: false
+  gem 'factory_bot_rails'
+  # gem 'rails-controller-testing'
+  gem 'faker'
+
+  gem 'awesome_print'
+  # gem 'better_errors'
+
+  gem 'tapping_device'
+end

@@ -8,55 +8,28 @@ $(document).on("ready page:load turbolinks:load", function() {
     }
 
     if ( !isValideCode( $(this).val() ) ) {
-      $("#error_code_label").hide();
+      $("#error_code_label").show();
       $("#success_code_label").hide();
       return false;
     }
-
-    $.ajax({
-      type: "POST",
-      url: "/check_verification_code",
-      data: "verification_code=" + $("#verification_code").val() + "&" + "verification_phone=" + $("#verification_phone").val(),
-      success: function(data) {
-        if (data.result === true) {
-          $("#provider_business_phone").val($("#verification_phone").val());
-          clearInterval(interval);
-          $("#error_code_label").hide();
-          $("#success_code_label").show();
-          $("#verification_code").prop("disabled", true);
-          $("#provider_submit").prop("value", "shared.navbar.pleasewait");
-          $("#providerform").submit();
-          return;
-        } else {
-          $("#error_code_label").text('shared.navbar.error_in_code'.show());
-        }
-      },
-      error: function(data) {
-        $("#error_code_label").text('shared.navbar.problem_sending_request'.show());
-      }
-    });
   });
 
-  $("#sendverification").click(function() {
+  $("#send_verification_code").click(function() {
     var time, seconds, phone_string;
 
     phone_string = $("#verification_phone").val();
 
-    function isAValidePhone(phone_string) {
-      return(phone_string.length === 11);
-    }
-
-    if ( !isAValidePhone( phone_string ) ) {
-      $("#verification_phone").addClass( "is-invalid" );
-      $("#error_mobile_label").addClass( "invalid-feedback" );
+    if ( !validatePhone( phone_string ) ) {
+      setInvalidInputStyle( $("#verification_phone") )
       $("#error_mobile_label").text('号码格式不正确，请重新输入11位数字');
-      return false;
+      $("#error_mobile_label").show();
+      return;
     }
 
     time = 30000;
     seconds = Math.ceil(time / 1000);
 
-    countDown( $(this), seconds)
+    countDown( $(this), seconds )
 
     $.ajax({
       data: "verification_phone=" + phone_string,
@@ -64,19 +37,24 @@ $(document).on("ready page:load turbolinks:load", function() {
       url: "/sendverification",
       success: function(data) {
         if (data.result === true) {
-          $("#verification_code").show();
-          $("#verify_code_label").show();
-          $("#error_mobile_label").hide();
-          $("#error_code_label").hide();
-          $("#verification_code").val('');
-          $("#verification_code").focus();
+          send_verification_code_success();
         } else {
           // $("#error_mobile_label").text('shared.navbar.problem_sending_sms'.show());
-          $("#error_mobile_label").text('shared.navbar.problem_sending_sms');
+          var error_message;
+          if (data.error_message) {
+            error_message = data.error_message;
+          } else {
+            error_message = "problem_sending_sms";
+          }
+          setInvalidInputStyle( $("#verification_phone") )
+          $("#error_mobile_label").text(error_message);
+          $("#error_mobile_label").show();
         }
       },
       error: function(data) {
-        $("#error_mobile_label").text('shared.navbar.problem_sendbing_request');
+        setInvalidInputStyle( $("#verification_phone") )
+        $("#error_mobile_label").text("problem_sending_request");
+        $("#error_mobile_label").show();
       }
     });
   });
@@ -100,4 +78,33 @@ $(document).on("ready page:load turbolinks:load", function() {
       }, 1000);
     });
   }
+
+  function setValidInputStyle(input_field){
+    input_field.removeClass( "is-invalid" );
+    input_field.addClass( "is-valid" );
+  }
+
+  function setInvalidInputStyle(input_field){
+    input_field.removeClass( "is-valid" );
+    input_field.addClass( "is-invalid" );
+  }
+
+  function validatePhone(phone_string) {
+    if (phone_string && phone_string.length === 11) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  function send_verification_code_success(){
+    $("#verification_details").show();
+    setValidInputStyle( $("#verification_phone") );
+    $("#error_mobile_label").hide();
+    $("#error_code_label").hide();
+    $("#verification_code").val('');
+    $("#verification_code").focus();
+    $("#submit_verification_btn").show();
+  }
+
 });

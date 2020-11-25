@@ -9,11 +9,12 @@
         <div id="phone_details" class='form-group'>
           <div class="form-group">
             <%= form.label "手机号:", class: 'control-label', id: 'verify_phone_label' %>
-            <%= form.text_field  :verification_phone, id: 'verification_phone' ,:class => "form-control", placeholder: '请输入您的手机号' %>
+            <%= form.text_field  :verification_phone, id: 'verification_phone' ,:class => "form-control" %>
             <small id="passwordHelpBlock" class="form-text text-muted col-12">
               请输入11位数字手机号
             </small>
-            <%= form.label "", class: 'control-label invalid-feedback', id: 'error_mobile_label', style:"display:none;" %>
+            <%= form.label "", class: 'control-label d-none', id: 'error_mobile_label' %>
+
 
           </div>
         </div>
@@ -24,14 +25,14 @@
         </div>
 
 
-        <div id="verification_details" class='form-group' style="display:none;">
+        <div id="verification_details" class='form-group'>
           <%= form.label "验证码:", id: 'verify_code_label', class: 'control-label', style:"" %>
-          <%= form.text_field :verification_code, placeholder: '请输入验证码', id: 'verification_code' ,:class => "form-control", :alt=> "999999" %>
+          <%= form.text_field :verification_code, placeholder: '请输入您收到的验证码', id: 'verification_code' ,:class => "form-control", :alt=> "999999" %>
           <%= form.label "请输入6位数字验证码", class: 'control-label', id: 'error_code_label', style:"display:none;" %>
           <%= form.label "", class: 'control-label', id: 'success_code_label' %>
         </div>
 
-        <div id="submit_verification_btn" class="actions"  style="display:none;">
+        <div id="submit_verification_btn" class="actions">
           <%= form.submit "登录", class: "btn btn-primary"%>
         </div>
       <% end %>
