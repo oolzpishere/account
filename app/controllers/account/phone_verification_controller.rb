@@ -24,9 +24,10 @@ module Account
         session[:mobile_verified] = true
         session[:validate_phone] = phone
       end
-      respond_to do |format|
-        format.json  { render :json => data}
-      end
+
+      sign_in user, :event => :authentication, scope: :user
+      redirect_to after_sign_in_path_for(Account::User), notice: '用户登录成功'
+
     end
 
     def sendverification

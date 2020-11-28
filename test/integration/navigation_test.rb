@@ -16,4 +16,7 @@ class NavigationTest < ActionDispatch::IntegrationTest
   #
   # end
 
+
+
+
 end

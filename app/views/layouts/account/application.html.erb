@@ -11,6 +11,14 @@
 <body class="bg grey lighten-5">
 
   <div class="container">
+    <% if notice %>
+      <p class="notice alert alert-success fade show" role="alert"><%= notice %></p>
+    <% end %>
+
+    <% if alert %>
+      <p class="alert"><%= alert %></p>
+    <% end %>
+
     <div class="login-wrap col-6 mx-auto mt-5">
       <div class="card white">
         <div class="card-header text-center white ">

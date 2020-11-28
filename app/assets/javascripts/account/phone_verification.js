@@ -29,7 +29,7 @@ $(document).on("ready page:load turbolinks:load", function() {
     time = 30000;
     seconds = Math.ceil(time / 1000);
 
-    countDown( $(this), seconds )
+    // countDown( $(this), seconds )
 
     $.ajax({
       data: "verification_phone=" + phone_string,

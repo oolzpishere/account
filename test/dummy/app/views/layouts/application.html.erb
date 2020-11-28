@@ -10,6 +10,14 @@
   </head>
 
   <body>
+    <% if notice %>
+      <p class="notice alert alert-success fade show" role="alert"><%= notice %></p>
+    <% end %>
+
+    <% if alert %>
+      <p class="alert"><%= alert %></p>
+    <% end %>
+    
     <%= yield %>
   </body>
 </html>

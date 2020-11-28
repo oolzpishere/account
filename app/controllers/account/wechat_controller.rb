@@ -30,7 +30,7 @@ module Account
       # 1. Add to initialze config file.
       # TODO: redirect to session[devise_after_sign_in] || user home page.
       # redirect_to "/user_views"
-      redirect_to after_sign_in_path_for(User)
+      redirect_to after_sign_in_path_for(Account::User)
     end
 
     private
