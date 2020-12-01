@@ -36,30 +36,25 @@ module Account
 
       unless phone = validate_phone(params[:verification_phone], )
         data[:error_message] = "号码格式不正确"
-        respond_to do |format|
-          format.json  { render :json => data}
-        end
-        return
       end
 
       # TODO:  if verification user == false
       # then skip find user.
-      unless user = user_find_by_phone(phone)
-        data[:error_message] = '此号码未注册用户，请重新填写'
-        respond_to do |format|
-          format.json  { render :json => data }
+      if data[:error_message].blank?
+        unless user = user_find_by_phone(phone)
+          data[:error_message] = '此号码未注册用户，请重新填写'
         end
-        return
       end
-      
-      if phone.present?
+
+      if data[:error_message].blank?
         # 验证码：{1}，此验证码{2}分钟内有效，请尽快完成验证。 提示：请勿泄露验证码给他人
-        params = [user_find_by_phone(phone).otp_code.to_s, DRIFT_MINUTES.to_s]
+        params = [user.otp_code.to_s, DRIFT_MINUTES.to_s]
         template_code = "276826"
         if Qcloud::Sms.single_sender(phone, template_code, params)
-          data = {:result => true}
+          data[:result] = true
         end
       end
+
       respond_to do |format|
         format.json  { render :json => data}
       end

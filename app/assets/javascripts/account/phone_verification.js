@@ -1,63 +1,63 @@
 $(document).on("ready page:load turbolinks:load", function() {
   var interval;
-  $("#verification_code").bind("keyup", function() {
-    var data;
 
-    function isValideCode(code_string) {
-      code_string.length == 6
-    }
+  if ( $("#send_verification_code").length > 0 ) {
+    sendVerificationCodeClickBinding();
+  }
 
-    if ( !isValideCode( $(this).val() ) ) {
-      $("#error_code_label").show();
-      $("#success_code_label").hide();
-      return false;
-    }
-  });
+  function sendVerificationCodeClickBinding(){
+    $("#send_verification_code").click(function() {
+      var time, seconds, phone_string;
 
-  $("#send_verification_code").click(function() {
-    var time, seconds, phone_string;
+      phone_string = $("#verification_phone").val();
 
-    phone_string = $("#verification_phone").val();
+      if ( !validatePhone( phone_string ) ) {
+        return;
+      }
 
-    if ( !validatePhone( phone_string ) ) {
-      setInvalidInputStyle( $("#verification_phone") )
-      $("#error_mobile_label").text('号码格式不正确，请重新输入11位数字');
-      $("#error_mobile_label").show();
-      return;
-    }
+      time = 30000;
+      seconds = Math.ceil(time / 1000);
 
-    time = 30000;
-    seconds = Math.ceil(time / 1000);
+      // countDown( $(this), seconds )
 
-    // countDown( $(this), seconds )
-
-    $.ajax({
-      data: "verification_phone=" + phone_string,
-      type: "get",
-      url: "/sendverification",
-      success: function(data) {
-        if (data.result === true) {
-          send_verification_code_success();
-        } else {
-          // $("#error_mobile_label").text('shared.navbar.problem_sending_sms'.show());
-          var error_message;
-          if (data.error_message) {
-            error_message = data.error_message;
+      $.ajax({
+        data: "verification_phone=" + phone_string,
+        type: "get",
+        url: "/sendverification",
+        success: function(data) {
+          if (data.result === true) {
+            phoneElemsSuccessSet();
+            verifyAndSubmitElemsShow();
           } else {
-            error_message = "problem_sending_sms";
+            // error_message = "problem_sending_sms";
+            phoneElemsFailSet(data.error_message)
           }
-          setInvalidInputStyle( $("#verification_phone") )
-          $("#error_mobile_label").text(error_message);
-          $("#error_mobile_label").show();
+        },
+        error: function(data) {
+          phoneElemsFailSet("problem_sending_request")
         }
-      },
-      error: function(data) {
-        setInvalidInputStyle( $("#verification_phone") )
-        $("#error_mobile_label").text("problem_sending_request");
-        $("#error_mobile_label").show();
+      });
+    });
+  }
+
+  if ( $("#verification_code".length > 0) ) {
+    veriCodeBind();
+  }
+
+  function veriCodeBind(){
+    $("#verification_code").bind("keyup", function() {
+      var data;
+      if ( !isValideCode( $(this).val() ) ) {
+        $("#error_code_label").show();
+        $("#success_code_label").hide();
+        return;
       }
     });
-  });
+  }
+
+  function isValideCode(code_string) {
+    code_string.length == 6
+  }
 
   function countDown(obj, seconds){
     obj.each(function() {
@@ -79,6 +79,26 @@ $(document).on("ready page:load turbolinks:load", function() {
     });
   }
 
+
+  function validatePhone(phone_string){
+    if ( isValidatePhone( phone_string ) ) {
+      return true;
+    } else {
+      setInvalidInputStyle( $("#verification_phone") )
+      $("#error_mobile_label").text('号码格式不正确，请重新输入11位数字电话号码');
+      $("#error_mobile_label").show();
+      return false;
+    }
+  }
+
+  function isValidatePhone(phone_string) {
+    if (phone_string && phone_string.length === 11) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   function setValidInputStyle(input_field){
     input_field.removeClass( "is-invalid" );
     input_field.addClass( "is-valid" );
@@ -89,19 +109,19 @@ $(document).on("ready page:load turbolinks:load", function() {
     input_field.addClass( "is-invalid" );
   }
 
-  function validatePhone(phone_string) {
-    if (phone_string && phone_string.length === 11) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  function send_verification_code_success(){
-    $("#verification_details").show();
+  function phoneElemsSuccessSet(){
     setValidInputStyle( $("#verification_phone") );
     $("#error_mobile_label").hide();
     $("#error_code_label").hide();
+  }
+
+  function phoneElemsFailSet(error_message){
+    setInvalidInputStyle( $("#verification_phone") )
+    $("#error_mobile_label").text(error_message).show();
+  }
+
+  function verifyAndSubmitElemsShow(){
+    $("#verification_details").show();
     $("#verification_code").val('');
     $("#verification_code").focus();
     $("#submit_verification_btn").show();
