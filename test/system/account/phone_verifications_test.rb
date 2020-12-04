@@ -27,6 +27,9 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
     fill_in 'verification_phone', with: @phone
 
     click_link '发送验证码'
+    # countDown test
+    assert_content '再次发送验证码'
+    assert find('#send_verification_code', class: 'disabled')
 
     using_wait_time 5 do
       fill_in 'verification_code', with: fake_verification_code
@@ -57,6 +60,9 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
     fill_in 'verification_phone', with: diff_phone
 
     click_link '发送验证码'
+    # countDown test
+    assert_no_text '再次发送验证码'
+    assert has_no_css?('#send_verification_code', class: 'disabled')
 
     assert_content '此号码未注册用户，请重新填写'
   end

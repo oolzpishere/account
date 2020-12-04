@@ -1,8 +1,12 @@
 $(document).on("ready page:load turbolinks:load", function() {
-  var interval;
 
   if ( $("#send_verification_code").length > 0 ) {
     sendVerificationCodeClickBinding();
+
+    var verification_phone_elem = $("#verification_phone");
+    var send_verification_code_btn = $("#send_verification_code");
+    var count_down_text_elem = $("#count-down-text");
+    var countDownInterval;
   }
 
   function sendVerificationCodeClickBinding(){
@@ -18,7 +22,7 @@ $(document).on("ready page:load turbolinks:load", function() {
       time = 30000;
       seconds = Math.ceil(time / 1000);
 
-      // countDown( $(this), seconds )
+      countDown( seconds );
 
       $.ajax({
         data: "verification_phone=" + phone_string,
@@ -31,10 +35,12 @@ $(document).on("ready page:load turbolinks:load", function() {
           } else {
             // error_message = "problem_sending_sms";
             phoneElemsFailSet(data.error_message)
+            stopCountDown();
           }
         },
         error: function(data) {
           phoneElemsFailSet("problem_sending_request")
+          stopCountDown();
         }
       });
     });
@@ -59,26 +65,43 @@ $(document).on("ready page:load turbolinks:load", function() {
     code_string.length == 6
   }
 
-  function countDown(obj, seconds){
-    obj.each(function() {
-      var disabled_elem, new_text;
-      disabled_elem = obj;
-      $("#verification_phone").prop("disabled", true);
-      disabled_elem.prop("disabled", true);
-      new_text = 'shared.navbar.send_code_again';
-      disabled_elem.val(new_text + " (" + seconds + ")");
-      interval = setInterval(function() {
-        disabled_elem.val(new_text + " (" + --seconds + ")");
-        if (seconds === 0) {
-          $("#verification_phone").prop("disabled", false);
-          disabled_elem.prop("disabled", false);
-          disabled_elem.val(new_text);
-          clearInterval(interval);
-        }
-      }, 1000);
-    });
+  function countDown( seconds ){
+    phoneBlockStyle();
+    setCountDownInterval( seconds );
   }
 
+  function stopCountDown(){
+    clearCountDownInterval();
+    removePhoneBlockStyle();
+  }
+
+  function setCountDownInterval( seconds ) {
+    var send_again_text = '再次发送验证码';
+    count_down_text_elem.text(send_again_text + " (" + seconds + ")");
+
+    countDownInterval = setInterval(function() {
+      count_down_text_elem.text(send_again_text + " (" + --seconds + ")");
+      if (seconds <= 0) {
+        removePhoneBlockStyle()
+        clearCountDownInterval();
+      }
+    }, 1000);
+  }
+
+  function clearCountDownInterval(){
+    clearInterval(countDownInterval);
+  }
+
+  function phoneBlockStyle(){
+    send_verification_code_btn.addClass('disabled')
+    verification_phone_elem.prop("readOnly", true);
+  }
+
+  function removePhoneBlockStyle(){
+    send_verification_code_btn.removeClass('disabled')
+    verification_phone_elem.prop("readOnly", false);
+    count_down_text_elem.text("");
+  }
 
   function validatePhone(phone_string){
     if ( isValidatePhone( phone_string ) ) {

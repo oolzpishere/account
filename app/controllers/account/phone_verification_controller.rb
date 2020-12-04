@@ -10,27 +10,6 @@ module Account
 
     end
 
-    def check_verification_code
-      #d data = {:result => false}
-      unless phone = validate_phone(params[:verification_phone])
-        redirect_to(phone_login_path, alert: '号码格式不正确')
-        return false
-      end
-
-      unless user = user_find_by_phone(phone)
-        redirect_to(phone_login_path, alert: '此号码未注册用户，请重新填写')
-        return false
-      end
-      # default otp-code available for 30 second, drift: 60, is add 60 second more available time.
-      # drift 5 minutes.
-      if user.authenticate_otp(params[:verification_code], drift: (60 * DRIFT_MINUTES))
-        sign_in user, :event => :authentication, scope: :user
-        redirect_to after_sign_in_path_for(Account::User), notice: '用户登录成功'
-      else
-        redirect_to(phone_login_path, alert: '验证码不正确，请重新填写')
-      end
-    end
-
     def sendverification
       data = {:result => false}
 
@@ -57,6 +36,27 @@ module Account
 
       respond_to do |format|
         format.json  { render :json => data}
+      end
+    end
+
+    def check_verification_code
+      #d data = {:result => false}
+      unless phone = validate_phone(params[:verification_phone])
+        redirect_to(phone_login_path, alert: '号码格式不正确')
+        return false
+      end
+
+      unless user = user_find_by_phone(phone)
+        redirect_to(phone_login_path, alert: '此号码未注册用户，请重新填写')
+        return false
+      end
+      # default otp-code available for 30 second, drift: 60, is add 60 second more available time.
+      # drift 5 minutes.
+      if user.authenticate_otp(params[:verification_code], drift: (60 * DRIFT_MINUTES))
+        sign_in user, :event => :authentication, scope: :user
+        redirect_to after_sign_in_path_for(Account::User), notice: '用户登录成功'
+      else
+        redirect_to(phone_login_path, alert: '验证码不正确，请重新填写')
       end
     end
 
