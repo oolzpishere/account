@@ -2,10 +2,7 @@ $(document).on("ready page:load turbolinks:load", function() {
 
   if ( $("#send_verification_code").length > 0 ) {
     sendVerificationCodeClickBinding();
-
-    var verification_phone_elem = $("#verification_phone");
-    var send_verification_code_btn = $("#send_verification_code");
-    var count_down_text_elem = $("#count-down-text");
+    var page_sty = new PhoneVerificationNewPageSty();
     var countDownInterval;
   }
 
@@ -21,7 +18,7 @@ $(document).on("ready page:load turbolinks:load", function() {
 
       time = 30000;
       seconds = Math.ceil(time / 1000);
-
+      // block phone input and send btn, then send ajax, incase user click send btn multiple times.
       countDown( seconds );
 
       $.ajax({
@@ -30,16 +27,16 @@ $(document).on("ready page:load turbolinks:load", function() {
         url: "/sendverification",
         success: function(data) {
           if (data.result === true) {
-            phoneElemsSuccessSet();
-            verifyAndSubmitElemsShow();
+            page_sty.phoneElemsSuccessSet();
+            page_sty.verifyAndSubmitElemsShow();
           } else {
             // error_message = "problem_sending_sms";
-            phoneElemsFailSet(data.error_message)
+            page_sty.phoneElemsFailSet(data.error_message)
             stopCountDown();
           }
         },
         error: function(data) {
-          phoneElemsFailSet("problem_sending_request")
+          page_sty.phoneElemsFailSet("problem_sending_request")
           stopCountDown();
         }
       });
@@ -66,50 +63,39 @@ $(document).on("ready page:load turbolinks:load", function() {
   }
 
   function countDown( seconds ){
-    phoneBlockStyle();
+    page_sty.phoneBlockStyle();
     setCountDownInterval( seconds );
   }
 
   function stopCountDown(){
     clearCountDownInterval();
-    removePhoneBlockStyle();
-  }
-
-  function setCountDownInterval( seconds ) {
-    var send_again_text = '再次发送验证码';
-    count_down_text_elem.text(send_again_text + " (" + seconds + ")");
-
-    countDownInterval = setInterval(function() {
-      count_down_text_elem.text(send_again_text + " (" + --seconds + ")");
-      if (seconds <= 0) {
-        removePhoneBlockStyle()
-        clearCountDownInterval();
-      }
-    }, 1000);
+    page_sty.removePhoneBlockStyle();
   }
 
   function clearCountDownInterval(){
     clearInterval(countDownInterval);
   }
 
-  function phoneBlockStyle(){
-    send_verification_code_btn.addClass('disabled')
-    verification_phone_elem.prop("readOnly", true);
-  }
+  function setCountDownInterval( seconds ) {
+    var send_again_text = '再次发送验证码';
+    page_sty.count_down_text.text(send_again_text + " (" + seconds + ")");
 
-  function removePhoneBlockStyle(){
-    send_verification_code_btn.removeClass('disabled')
-    verification_phone_elem.prop("readOnly", false);
-    count_down_text_elem.text("");
+    countDownInterval = setInterval(function() {
+      page_sty.count_down_text.text(send_again_text + " (" + --seconds + ")");
+      if (seconds <= 0) {
+        page_sty.removePhoneBlockStyle();
+        clearCountDownInterval();
+      }
+    }, 1000);
   }
 
   function validatePhone(phone_string){
     if ( isValidatePhone( phone_string ) ) {
       return true;
     } else {
-      setInvalidInputStyle( $("#verification_phone") )
-      $("#error_mobile_label").text('号码格式不正确，请重新输入11位数字电话号码');
-      $("#error_mobile_label").show();
+      page_sty.setInvalidInputStyle( page_sty.verification_phone )
+      page_sty.error_mobile_label.text('号码格式不正确，请重新输入11位数字电话号码');
+      page_sty.error_mobile_label.show();
       return false;
     }
   }
@@ -122,32 +108,6 @@ $(document).on("ready page:load turbolinks:load", function() {
     }
   }
 
-  function setValidInputStyle(input_field){
-    input_field.removeClass( "is-invalid" );
-    input_field.addClass( "is-valid" );
-  }
 
-  function setInvalidInputStyle(input_field){
-    input_field.removeClass( "is-valid" );
-    input_field.addClass( "is-invalid" );
-  }
-
-  function phoneElemsSuccessSet(){
-    setValidInputStyle( $("#verification_phone") );
-    $("#error_mobile_label").hide();
-    $("#error_code_label").hide();
-  }
-
-  function phoneElemsFailSet(error_message){
-    setInvalidInputStyle( $("#verification_phone") )
-    $("#error_mobile_label").text(error_message).show();
-  }
-
-  function verifyAndSubmitElemsShow(){
-    $("#verification_details").show();
-    $("#verification_code").val('');
-    $("#verification_code").focus();
-    $("#submit_verification_btn").show();
-  }
 
 });
