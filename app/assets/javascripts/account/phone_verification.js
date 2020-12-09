@@ -80,7 +80,7 @@ $(document).on("ready page:load turbolinks:load", function() {
     var send_again_text = '再次发送验证码';
     page_sty.count_down_text.text(send_again_text + " (" + seconds + ")");
 
-    countDownInterval = setInterval(function() {
+    countDownInterval = setInterval( function() {
       page_sty.count_down_text.text(send_again_text + " (" + --seconds + ")");
       if (seconds <= 0) {
         page_sty.removePhoneBlockStyle();
@@ -89,7 +89,7 @@ $(document).on("ready page:load turbolinks:load", function() {
     }, 1000);
   }
 
-  function validatePhone(phone_string){
+  function validatePhone( phone_string ) {
     if ( isValidatePhone( phone_string ) ) {
       return true;
     } else {
@@ -107,7 +107,5 @@ $(document).on("ready page:load turbolinks:load", function() {
       return false;
     }
   }
-
-
 
 });

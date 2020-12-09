@@ -6,14 +6,14 @@ module Account
 
     DRIFT_MINUTES = 5
 
-    def new
+    def login
 
     end
 
     def sendverification
       data = {:result => false}
 
-      unless phone = validate_phone(params[:verification_phone], )
+      unless phone = validate_phone( params[:verification_phone] )
         data[:error_message] = "号码格式不正确"
       end
 
@@ -67,7 +67,7 @@ module Account
       # end
 
       def phone_login_path
-        account.phone_verification_new_path
+        account.phone_verification_login_path
       end
 
       def user_find_by_phone(phone)

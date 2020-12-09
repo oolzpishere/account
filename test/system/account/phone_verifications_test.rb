@@ -22,7 +22,7 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
 
     # mock after_sign_in_path_for
     # Account::PhoneVerificationController.any_instance.stubs(:after_sign_in_path_for).returns(user_views_path)
-    visit "/phone_verification/new"
+    visit "/phone_verification/login"
 
     fill_in 'verification_phone', with: @phone
 
@@ -43,7 +43,7 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
   test "phone_verification_new with wrong phone number" do
     short_phone = "123"
 
-    visit "/phone_verification/new"
+    visit "/phone_verification/login"
 
     fill_in 'verification_phone', with: short_phone
 
@@ -55,7 +55,7 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
   test "phone_verification_new with diff phone of create_user" do
     diff_phone = "12345678900"
 
-    visit "/phone_verification/new"
+    visit "/phone_verification/login"
 
     fill_in 'verification_phone', with: diff_phone
 
@@ -70,7 +70,7 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
   test "phone_verification_new with same phone of create_user, but wrong otp" do
     wrong_verification_code = "654321"
 
-    visit "/phone_verification/new"
+    visit "/phone_verification/login"
 
     fill_in 'verification_phone', with: @phone
 
