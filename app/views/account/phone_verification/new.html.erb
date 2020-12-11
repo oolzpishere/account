@@ -4,8 +4,8 @@
 
   <div class="row no-gutters py-2 ">
     <div class="col">
-      <%= form_with(scope: "user", url: account.check_verification_code_path, local: true) do |form| %>
-        <%= form.hidden_field :user_action, value: "login" %>
+      <%= form_with(scope: "user", url: account.phone_verification_create_path, local: true) do |form| %>
+        <%= form.hidden_field :user_action, value: "create" %>
 
         <div id="phone_details" class='form-group'>
           <div class="form-group">
@@ -15,8 +15,20 @@
               请输入11位数字手机号
             </small>
             <%= form.label "", class: 'control-label invalid-feedback', id: 'error_mobile_label', style:"display:none;" %>
-
           </div>
+        </div>
+
+        <div id="password" class='form-group'>
+          <%= form.label "密码" %>
+          <% if @minimum_password_length %>
+          <em>(<%= @minimum_password_length %> characters minimum)</em>
+          <% end %><br />
+          <%= form.password_field :password, id: "password", :class => "form-control", autocomplete: "new-password" %>
+        </div>
+
+        <div id="password_confirmation" class='form-group'>
+          <%= form.label "确认密码" %><br />
+          <%= form.password_field :password_confirmation, id: "password_confirmation", :class => "form-control", autocomplete: "new-password" %>
         </div>
 
         <div class="form-group">
@@ -33,7 +45,7 @@
         </div>
 
         <div id="submit_verification_btn" class="actions"  style="display:none;">
-          <%= form.submit "登录", class: "btn btn-primary"%>
+          <%= form.submit "注册", class: "btn btn-primary"%>
         </div>
       <% end %>
     </div>

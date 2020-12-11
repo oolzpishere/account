@@ -18,13 +18,13 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
 
     # mock send sms.
     # Qcloud::Sms.single_sender(phone, @template_code, params)
-    Qcloud::Sms.expects(:single_sender).with(@phone, @template_code, params).returns(true)
+    Qcloud::Sms.expects(:single_sender).with(@user.phone, @template_code, params).returns(true)
 
     # mock after_sign_in_path_for
     # Account::PhoneVerificationController.any_instance.stubs(:after_sign_in_path_for).returns(user_views_path)
     visit "/phone_verification/login"
 
-    fill_in 'verification_phone', with: @phone
+    fill_in 'phone', with: @user.phone
 
     click_link '发送验证码'
     # countDown test
@@ -37,7 +37,7 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
     click_button '登录'
 
     assert_content '用户登录成功'
-    assert_content @phone
+    assert_content @user.phone
   end
 
   test "phone_verification_new with wrong phone number" do
@@ -45,7 +45,7 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
 
     visit "/phone_verification/login"
 
-    fill_in 'verification_phone', with: short_phone
+    fill_in 'phone', with: short_phone
 
     click_link '发送验证码'
 
@@ -57,7 +57,7 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
 
     visit "/phone_verification/login"
 
-    fill_in 'verification_phone', with: diff_phone
+    fill_in 'phone', with: diff_phone
 
     click_link '发送验证码'
     # countDown test
@@ -72,7 +72,7 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
 
     visit "/phone_verification/login"
 
-    fill_in 'verification_phone', with: @phone
+    fill_in 'phone', with: @user.phone
 
     click_link '发送验证码'
 
@@ -80,6 +80,23 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
     click_button '登录'
 
     assert_content '验证码不正确，请重新填写'
+  end
+
+  test "create user with phone already registered" do
+    byebug
+    Account::User.any_instance.stubs(:authenticate_otp).returns( true )
+
+    visit "/phone_verification/new"
+    fill_in 'phone', with: @user.phone
+    fill_in 'password', with: @user.password
+    fill_in 'password_confirmation', with: @user.password_confirmation
+
+    click_link '发送验证码'
+
+    fill_in 'verification_code', with: "123456"
+    click_button '注册'
+
+    assert_content '此号码已注册，请重新输入'
   end
 
 end

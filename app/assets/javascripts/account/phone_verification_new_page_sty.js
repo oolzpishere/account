@@ -1,5 +1,5 @@
 var PhoneVerificationNewPageSty = function(){
-  this.verification_phone = $("#verification_phone");
+  this.phone = $("#phone");
   this.send_verification_code_btn = $("#send_verification_code");
   this.count_down_text = $("#count-down-text");
 
@@ -14,12 +14,12 @@ var PhoneVerificationNewPageSty = function(){
 
 PhoneVerificationNewPageSty.prototype.phoneBlockStyle = function(){
   this.send_verification_code_btn.addClass('disabled')
-  this.verification_phone.prop("readOnly", true);
+  this.phone.prop("readOnly", true);
 }
 
 PhoneVerificationNewPageSty.prototype.removePhoneBlockStyle = function(){
   this.send_verification_code_btn.removeClass('disabled')
-  this.verification_phone.prop("readOnly", false);
+  this.phone.prop("readOnly", false);
 
   this.count_down_text.text("");
 }
@@ -35,13 +35,13 @@ PhoneVerificationNewPageSty.prototype.setInvalidInputStyle = function(input_fiel
 }
 
 PhoneVerificationNewPageSty.prototype.phoneElemsSuccessSet = function(){
-  this.setValidInputStyle( this.verification_phone );
+  this.setValidInputStyle( this.phone );
   this.error_mobile_label.hide();
   this.error_code_label.hide();
 }
 
 PhoneVerificationNewPageSty.prototype.phoneElemsFailSet = function(error_message){
-  this.setInvalidInputStyle( this.verification_phone )
+  this.setInvalidInputStyle( this.phone )
   this.error_mobile_label.text(error_message).show();
 }
 

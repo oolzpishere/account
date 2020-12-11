@@ -10,7 +10,9 @@ $(document).on("ready page:load turbolinks:load", function() {
     $("#send_verification_code").click(function() {
       var time, seconds, phone_string;
 
-      phone_string = $("#verification_phone").val();
+      phone_string = $("#phone").val();
+      user_action = $("#user_action").val();
+
 
       if ( !validatePhone( phone_string ) ) {
         return;
@@ -22,9 +24,9 @@ $(document).on("ready page:load turbolinks:load", function() {
       countDown( seconds );
 
       $.ajax({
-        data: "verification_phone=" + phone_string,
+        data: "phone=" + phone_string + "&user_action=" + user_action,
         type: "get",
-        url: "/sendverification",
+        url: "/send_verification",
         success: function(data) {
           if (data.result === true) {
             page_sty.phoneElemsSuccessSet();
@@ -93,7 +95,7 @@ $(document).on("ready page:load turbolinks:load", function() {
     if ( isValidatePhone( phone_string ) ) {
       return true;
     } else {
-      page_sty.setInvalidInputStyle( page_sty.verification_phone )
+      page_sty.setInvalidInputStyle( page_sty.phone )
       page_sty.error_mobile_label.text('号码格式不正确，请重新输入11位数字电话号码');
       page_sty.error_mobile_label.show();
       return false;

@@ -6,7 +6,10 @@ Account::Engine.routes.draw do
   get "/auth/:action/callback", :controller => "user/wechat", :constraints => { :action => /wechat/ }
 
   get "phone_verification/login", :controller => "/account/phone_verification", :action => "login"
+  get "phone_verification/new", :controller => "/account/phone_verification", :action => "new"
+  post "phone_verification/create", :controller => "/account/phone_verification", :action => "create"
+
   post :check_verification_code, :controller => "/account/phone_verification", :action => "check_verification_code"
-  get :sendverification, :controller => "/account/phone_verification", :action => "sendverification"
+  get :send_verification, :controller => "/account/phone_verification", :action => "send_verification"
 
 end
