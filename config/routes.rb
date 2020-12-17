@@ -4,12 +4,13 @@ Account::Engine.routes.draw do
 
   # get "/auth/wechat/callback" => "authentications#wechat"
   get "/auth/:action/callback", :controller => "user/wechat", :constraints => { :action => /wechat/ }
-
-  get "phone_verification/login", :controller => "/account/phone_verification", :action => "login"
+  # for create account
   get "phone_verification/new", :controller => "/account/phone_verification", :action => "new"
   post "phone_verification/create", :controller => "/account/phone_verification", :action => "create"
-
+  # for login
+  get "phone_verification/login", :controller => "/account/phone_verification", :action => "login"
   post :check_verification_code, :controller => "/account/phone_verification", :action => "check_verification_code"
+  # send_verification_code sms
   get :send_verification, :controller => "/account/phone_verification", :action => "send_verification"
 
 end

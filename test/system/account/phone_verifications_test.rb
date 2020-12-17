@@ -5,16 +5,13 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
     @user = create_user
     @template_code = "276826"
     @phone = @user.phone
+    @fake_verification_code = '123456'
   end
 
-
-
-  test "phone_verification_new with right phone, same phone of create_user, right otp" do
-    fake_verification_code = '123456'
-    Account::User.any_instance.stubs(:otp_code).returns( fake_verification_code )
+  test "login with right phone, same phone of create_user, right otp" do
     Account::User.any_instance.stubs(:authenticate_otp).returns( true )
-
-    params = [fake_verification_code, Account::PhoneVerificationController::DRIFT_MINUTES.to_s]
+    Account::User.any_instance.stubs(:otp_code).returns( @fake_verification_code )
+    params = [@fake_verification_code, Account::PhoneVerificationController::DRIFT_MINUTES.to_s]
 
     # mock send sms.
     # Qcloud::Sms.single_sender(phone, @template_code, params)
@@ -32,7 +29,7 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
     assert find('#send_verification_code', class: 'disabled')
 
     using_wait_time 5 do
-      fill_in 'verification_code', with: fake_verification_code
+      fill_in 'verification_code', with: @fake_verification_code
     end
     click_button '登录'
 
@@ -40,7 +37,7 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
     assert_content @user.phone
   end
 
-  test "phone_verification_new with wrong phone number" do
+  test "login with wrong phone number" do
     short_phone = "123"
 
     visit "/phone_verification/login"
@@ -52,7 +49,7 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
     assert_content '号码格式不正确'
   end
 
-  test "phone_verification_new with diff phone of create_user" do
+  test "login with diff phone of create_user" do
     diff_phone = "12345678900"
 
     visit "/phone_verification/login"
@@ -67,8 +64,9 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
     assert_content '此号码未注册用户，请重新填写'
   end
 
-  test "phone_verification_new with same phone of create_user, but wrong otp" do
+  test "login with same phone of create_user, but wrong otp" do
     wrong_verification_code = "654321"
+    Qcloud::Sms.stubs(:single_sender).returns(true)
 
     visit "/phone_verification/login"
 
@@ -83,7 +81,6 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
   end
 
   test "create user with phone already registered" do
-    byebug
     Account::User.any_instance.stubs(:authenticate_otp).returns( true )
 
     visit "/phone_verification/new"
@@ -92,11 +89,49 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
     fill_in 'password_confirmation', with: @user.password_confirmation
 
     click_link '发送验证码'
+    # fill_in 'verification_code', with: "123456"
+    # click_button '注册'
+    # assert_content '电话号码 已被使用'
+    assert_content '此号码已注册，请重新填写'
+  end
+
+  test "create user with diff password" do
+    Account::User.any_instance.stubs(:authenticate_otp).returns( true )
+    Qcloud::Sms.stubs(:single_sender).returns(true)
+
+    new_phone = "12345678900"
+    diff_pw = @user.password + "1"
+
+    visit "/phone_verification/new"
+    fill_in 'phone', with: new_phone
+    fill_in 'password', with: @user.password
+    fill_in 'password_confirmation', with: diff_pw
+
+    click_link '发送验证码'
 
     fill_in 'verification_code', with: "123456"
     click_button '注册'
 
-    assert_content '此号码已注册，请重新输入'
+    assert_content '密码不匹配，请重新输入'
+  end
+
+  test "create user with wrong verification_code" do
+    Qcloud::Sms.stubs(:single_sender).returns(true)
+
+    new_phone = "12345678900"
+    wrong_verification_code = "123456"
+
+    visit "/phone_verification/new"
+    fill_in 'phone', with: new_phone
+    fill_in 'password', with: @user.password
+    fill_in 'password_confirmation', with: @user.password
+
+    click_link '发送验证码'
+
+    fill_in 'verification_code', with: wrong_verification_code
+    click_button '注册'
+
+    assert_content '验证码不正确，请重新填写'
   end
 
 end

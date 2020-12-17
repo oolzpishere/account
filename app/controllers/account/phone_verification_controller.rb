@@ -21,16 +21,11 @@ module Account
     def create
       status = {:result => false}
       phone_num = user_params[:phone]
-      verification_code = user_params[:verification_code]
+      verification_code = verification_params[:verification_code]
+      new_user = new_user_with_session_otp
 
       unless phone = validate_phone( phone_num )
         status[:error_message] = "号码格式不正确"
-      end
-
-      if status[:error_message].blank?
-        if user_find_by_phone(phone)
-          status[:error_message] = '此号码已注册，请重新输入'
-        end
       end
 
       if status[:error_message].blank?
@@ -42,14 +37,20 @@ module Account
       end
 
       if status[:error_message].blank?
-        user = new_user
-        unless user.authenticate_otp(verification_code, drift: DRIFT_SECOND.to_s)
+        new_user.valid?
+        if new_user.errors.any?
+          status[:error_message] = new_user.errors.full_messages.join(', ')
+        end
+      end
+
+      if status[:error_message].blank?
+        unless new_user.authenticate_otp(verification_code, drift: DRIFT_SECOND)
           status[:error_message] = '验证码不正确，请重新填写'
         end
       end
 
       if status[:error_message].blank?
-        unless user.save
+        unless new_user.save
           status[:error_message] = '用户注册失败'
         end
       end
@@ -57,7 +58,7 @@ module Account
       if status[:error_message]
         redirect_to( phone_registration_path, alert: status[:error_message] )
       else
-        sign_in user, :event => :authentication, scope: :user
+        sign_in new_user, :event => :authentication, scope: :user
         redirect_to after_sign_in_path_for(Account::User), notice: '用户注册成功'
       end
     end
@@ -85,7 +86,7 @@ module Account
     def check_verification_code
       #d data = {:result => false}
       phone_num = user_params[:phone]
-      verification_code = user_params[:verification_code]
+      verification_code = verification_params[:verification_code]
 
       unless phone = validate_phone( phone_num )
         redirect_to(phone_login_path, alert: '号码格式不正确')
@@ -108,7 +109,11 @@ module Account
     private
       # don't need to use yet.
       def user_params
-        params.fetch(:user, {}).permit(:phone, :verification_code, :password, :password_confirmation)
+        params.fetch(:user, {}).permit(:phone, :password, :password_confirmation)
+      end
+
+      def verification_params
+        params.fetch(:user, {}).permit(:verification_code)
       end
 
       def phone_login_path
@@ -127,12 +132,12 @@ module Account
         (phone && phone.match(/^[0-9]{11}$/)) ? phone : false
       end
 
-      def new_user
+      def new_user_with_session_otp
         i = Devise.friendly_token[0,20]
         # return nil, if create! fail
         user = Account::User.new(user_params)
         user.email = "#{i}@sflx.com.cn"
-        user.otp_random_secret = session.delete("otp_random_secret")
+        user.otp_secret_key = session.delete("otp_random_secret")
         user
       end
 

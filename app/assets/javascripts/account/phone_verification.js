@@ -8,11 +8,10 @@ $(document).on("ready page:load turbolinks:load", function() {
 
   function sendVerificationCodeClickBinding(){
     $("#send_verification_code").click(function() {
-      var time, seconds, phone_string;
+      var time, seconds, phone_string, user_action;
 
       phone_string = $("#phone").val();
       user_action = $("#user_action").val();
-
 
       if ( !validatePhone( phone_string ) ) {
         return;

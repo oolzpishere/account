@@ -15,5 +15,9 @@ module Account
       end
     end
 
+    initializer 'account.default_locale' do |app|
+      app.config.i18n.default_locale = 'zh-CN'
+    end
+
   end
 end

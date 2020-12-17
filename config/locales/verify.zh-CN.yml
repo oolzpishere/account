@@ -1,0 +1,11 @@
+zh-CN:
+  activerecord:
+    attributes:
+      account/user:
+        phone: "电话号码"
+  # attributes:
+  #   phone: "电话"
+  errors:
+    messages:
+      required: "必须有"
+      taken: "已被使用"

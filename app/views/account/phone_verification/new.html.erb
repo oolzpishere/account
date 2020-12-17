@@ -5,7 +5,7 @@
   <div class="row no-gutters py-2 ">
     <div class="col">
       <%= form_with(scope: "user", url: account.phone_verification_create_path, local: true) do |form| %>
-        <%= form.hidden_field :user_action, value: "create" %>
+        <%= form.hidden_field :user_action, id: "user_action", value: "create" %>
 
         <div id="phone_details" class='form-group'>
           <div class="form-group">
