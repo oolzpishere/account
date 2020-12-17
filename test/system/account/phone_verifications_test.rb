@@ -119,7 +119,6 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
     Qcloud::Sms.stubs(:single_sender).returns(true)
 
     new_phone = "12345678900"
-    wrong_verification_code = "123456"
 
     visit "/phone_verification/new"
     fill_in 'phone', with: new_phone
@@ -128,10 +127,30 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
 
     click_link '发送验证码'
 
-    fill_in 'verification_code', with: wrong_verification_code
+    fill_in 'verification_code', with: @fake_verification_code
     click_button '注册'
 
     assert_content '验证码不正确，请重新填写'
+  end
+
+  test "create user with right params" do
+    Account::User.any_instance.stubs(:authenticate_otp).returns( true )
+    Qcloud::Sms.stubs(:single_sender).returns(true)
+
+    new_phone = "12345678900"
+
+    visit "/phone_verification/new"
+    fill_in 'phone', with: new_phone
+    fill_in 'password', with: @user.password
+    fill_in 'password_confirmation', with: @user.password
+
+    click_link '发送验证码'
+
+    fill_in 'verification_code', with: @fake_verification_code
+    click_button '注册'
+
+    assert_content '用户注册成功'
+    assert_equal 2, Account::User.count
   end
 
 end
