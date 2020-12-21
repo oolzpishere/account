@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <%= stylesheet_link_tag    "account/application", media: "all" %>
+  <%= javascript_include_tag "account/application" %>
+</head>
+<body class="bg grey lighten-5">
+  <!-- <h3>##for devise</h3> -->
+  <div class="container">
+    <% if notice %>
+      <p class="notice alert alert-success fade show" role="alert"><%= notice %></p>
+    <% end %>
+
+    <% if alert %>
+      <p class="alert"><%= alert %></p>
+    <% end %>
+
+    <div class="login-wrap col-6 mx-auto mt-5">
+      <div class="card white">
+        <% if login_corp_name %>
+          <div class="card-header text-center white ">
+            <div class="h5">
+              <%= login_corp_name %>
+            </div>
+          </div>
+        <% end %>
+        <div class="card-body white">
+          <%= yield %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
