@@ -1,7 +1,8 @@
 
 module Account
-  class WechatController < ::Account::ApplicationController
-    # skip_before_action :verify_authenticity_token, :authenticate_user!
+  class WechatController < ::ActionController::Base
+    # skip_before_action :verify_authenticity_token, only: :wechat
+    # skip_before_action :authenticate_user!
     # not authenticate_user! when callback to wechat.
 
     before_action :get_info
@@ -29,7 +30,6 @@ module Account
       # TODO: consider how to add this setting to difference App.
       # 1. Add to initialze config file.
       # TODO: redirect to session[devise_after_sign_in] || user home page.
-      # redirect_to "/user_views"
       redirect_to after_sign_in_path_for(Account::User)
     end
 

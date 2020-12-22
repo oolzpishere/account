@@ -23,6 +23,6 @@
   </div>
 <% end %>
 
-<%= button_to "微信登录", "/auth/wechat", form_class: "" %>
+<%= link_to "微信登录", "/auth/wechat", form_class: "", method: :post %>
 
 <%= render "users/shared/links" %>

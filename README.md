@@ -2,7 +2,12 @@
 Short description and motivation.
 
 ## Usage
-How to use my plugin.
+copy template/devise.rb to your application: config/initializer/devise.rb.
+for wechat omniauth
+copy template/omniauth.rb to your application: config/initializer/omniauth.rb.
+<!-- copy db/migrate to your application. -->
+
+
 
 ## Installation
 Add this line to your application's Gemfile:
