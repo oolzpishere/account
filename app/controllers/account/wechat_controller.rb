@@ -5,11 +5,23 @@ module Account
     # skip_before_action :authenticate_user!
     # not authenticate_user! when callback to wechat.
 
-    before_action :get_info
+    # before_action :get_info, only: [:wechat]
     # set class vars after get_info success.
     attr_reader :auth_info, :wechat_user_info, :raw_info, :provider, :openid , :unionid
 
+    def setup
+      if (scope = params["scope"]) && scope.match("snsapi_base")
+        request.env['omniauth.strategy'].options[:authorize_params][:scope]="snsapi_base"
+      end
+      render :plain => "Omniauth setup phase.", :status => 404
+    end
+
     def wechat
+      # if (scope = params["scope"]) && scope.match("snsapi_base")
+      #   redirect_to action: "wechat_base"
+      #   return
+      # end
+      get_info
       @wechat_user_info = auth_info.info  # https://github.com/skinnyworm/omniauth-wechat-oauth2
       @raw_info = auth_info.extra[:raw_info]
       @provider = auth_info.provider
@@ -31,6 +43,14 @@ module Account
       # 1. Add to initialze config file.
       # TODO: redirect to session[devise_after_sign_in] || user home page.
       redirect_to after_sign_in_path_for(Account::User)
+    end
+
+    def wechat_base
+
+      session['wechat_snsapi_base_raw_info'] = request.env['omniauth.auth'].extra.raw_info.to_hash
+      logger.debug "Logging order total********** "
+      logger.debug  request.env['omniauth.auth']
+      redirect_to request.env['omniauth.origin'] || '/'
     end
 
     private

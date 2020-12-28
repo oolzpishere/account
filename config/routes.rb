@@ -15,7 +15,10 @@ Account::Engine.routes.draw do
 
   # wechat login
   # eg: get "/auth/:action/callback", :controller => "authentications", :constraints => { :action => /wechat|google/ }
-  get "/auth/:action/callback", :controller => "/account/wechat", :constraints => { :action => /wechat/ }
+  get "/auth/wechat/callback", :controller => "/account/wechat", action: "wechat", :constraints => lambda { |request| request.params[:scope].blank? }
+  get "/auth/wechat/callback", :controller => "/account/wechat", action: "wechat_base", :constraints => lambda { |request| request.params[:scope] == "snsapi_base" }
+  match '/auth/:provider/setup' => '/account/wechat#setup', via: [:get]
+  /wechat_base/ }
 
 
 end
