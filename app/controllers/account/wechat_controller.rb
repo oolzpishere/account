@@ -50,7 +50,11 @@ module Account
       session['wechat_snsapi_base_raw_info'] = request.env['omniauth.auth'].extra.raw_info.to_hash
       logger.debug "Logging order total********** "
       logger.debug  request.env['omniauth.auth']
-      redirect_to request.env['omniauth.origin'] || '/'
+      logger.debug request.env['omniauth.origin']
+
+      redirect_url = get_after_wechat_base_callback_url || request.env['omniauth.origin'] || '/'
+
+      redirect_to redirect_url
     end
 
     private
@@ -116,6 +120,10 @@ module Account
         return false
       end
       identify
+    end
+
+    def get_after_wechat_base_callback_url
+      session.delete("after_wechat_base_callback_url")
     end
 
   end
