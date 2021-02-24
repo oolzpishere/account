@@ -2,6 +2,10 @@ module Account
   class Engine < ::Rails::Engine
     isolate_namespace Account
 
+    class<< self
+      attr_accessor :custom_routes, :admin_modle_devise_setting
+    end
+
     initializer 'account.asset_precompile_paths' do |app|
       # app.config.assets.precompile += ["shared/manifests/*"]
       app.config.assets.precompile += %w( account/application.js account/application.css )
