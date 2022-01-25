@@ -1,5 +1,5 @@
 Account::Engine.routes.draw do
-  if Account::Engine.custom_routes && Account::Engine.custom_routes == true
+  if Account::Engine.custom_routes && (Account::Engine.custom_routes == true)
     # class_eval(Account::Engine.custom_routes_draw)
   else
     devise_for :users, module: 'devise', class_name: "Account::User"
