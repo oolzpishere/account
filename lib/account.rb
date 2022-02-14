@@ -1,7 +1,7 @@
 require "account/engine"
 
-require 'bootstrap'
-require 'jquery-rails'
+# require 'bootstrap'
+# require 'jquery-rails'
 
 require 'devise'
 require 'active_model_otp'
