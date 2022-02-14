@@ -25,12 +25,12 @@ Gem::Specification.new do |spec|
 
   spec.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
 
-  spec.add_development_dependency "sqlite3"
+  # spec.add_development_dependency "sqlite3"
 
-  spec.add_dependency 'jquery-rails'
+  # spec.add_dependency 'jquery-rails'
   # spec.add_dependency 'jquery-ui-rails'
   # spec.add_dependency 'jquery-fileupload-rails'
-  spec.add_dependency 'bootstrap'
+  # spec.add_dependency 'bootstrap'
 
   spec.add_dependency 'devise'
   spec.add_dependency 'devise-i18n'
