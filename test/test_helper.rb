@@ -1,21 +1,22 @@
 # Configure Rails Environment
 ENV["RAILS_ENV"] = "test"
 
-require 'capybara/rails'
+# require 'capybara/rails'
 require 'capybara/minitest'
 require 'mocha/minitest'
 # wait Ajax request to return for 5 seconds, default is 2s.
-Capybara.default_max_wait_time = 5
+# Capybara.default_max_wait_time = 5
+# Capybara.app = MyRackApp
 
 require_relative "../test/dummy/config/environment"
 ActiveRecord::Migrator.migrations_paths = [File.expand_path("../test/dummy/db/migrate", __dir__)]
-ActiveRecord::Migrator.migrations_paths << File.expand_path('../db/migrate', __dir__)
+# ActiveRecord::Migrator.migrations_paths << File.expand_path('../db/migrate', __dir__)
 require "rails/test_help"
 
 
 # Filter out Minitest backtrace while allowing backtrace from other libraries
 # to be shown.
-Minitest.backtrace_filter = Minitest::BacktraceFilter.new
+# Minitest.backtrace_filter = Minitest::BacktraceFilter.new
 
 
 # Load fixtures from the engine
