@@ -27,7 +27,7 @@ group :development, :test do
   # download the exact version with your chromebrowser, don't user gem:webdriver.
   gem 'selenium-webdriver'
 
-  gem 'rspec-rails'
+  # gem 'rspec-rails'
   # guard detect chang need gem install rb-fsevent
   # gem 'guard-rspec', require: false
   gem 'factory_bot_rails'
