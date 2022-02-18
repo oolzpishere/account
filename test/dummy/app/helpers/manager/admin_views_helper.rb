@@ -1,0 +1,2 @@
+module Manager::AdminViewsHelper
+end

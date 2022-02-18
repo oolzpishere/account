@@ -133,9 +133,10 @@ module Account
       end
 
       def new_user_with_session_otp
-        i = Devise.friendly_token[0,20]
         # return nil, if create! fail
         user = Account::User.new(user_params)
+
+        i = Devise.friendly_token[0,20]
         user.email = "#{i}@sflx.com.cn"
         user.otp_secret_key = session.delete("otp_random_secret")
         user

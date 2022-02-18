@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @user_user_view %>
+
+<div>
+  <%= link_to "Edit this user view", edit_user_user_view_path(@user_user_view) %> |
+  <%= link_to "Back to user views", user_user_views_path %>
+
+  <%= button_to "Destroy this user view", @user_user_view, method: :delete %>
+</div>

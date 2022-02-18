@@ -111,6 +111,7 @@ zh-CN:
     sessions:
       already_signed_out: 您已登出。
       new:
+        login: 手机 / 邮箱
         sign_in: 登录
         email: 电子邮箱
         password: 密码

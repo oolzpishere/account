@@ -10,20 +10,33 @@ gem 'account'
 
 ## Usage
 
-copy template/devise.rb to your application: admin_engine/config/initializer/devise.rb || config/initializer/devise.rb.
+1. copy template/devise.rb to your application: admin_engine/config/initializer/devise.rb || config/initializer/devise.rb.
 
+2. Add account gem routes to your app/config/routes.rb.
 ```ruby
 mount Account::Engine   => '/', as: 'account'
 ```
-Add account gem routes to your app/config/routes.rb.
 
-for wechat omniauth
+3. for wechat omniauth
 copy template/omniauth.rb to your application: config/initializer/omniauth.rb.
 
-<!-- copy db/migrate to your application. -->
+4. copy db/migrate to your application.
 ```bash
 $ rails db:migrate
 ```
+
+5. add before_action :authenticate_manager, to your ApplicationController
+```ruby
+def authenticate_manager
+  unless admin_signed_in? && (current_admin.role == "admin")
+    sign_out :admin
+    redirect_to account.new_admin_session_path, notice: "请使用admin账户访问该页面"
+  end
+end
+```
+
+### Info
+phone_verification use `fetch`, not support IE.
 
 ### Config
 Create `config/initializers/account_engine.rb` and put following configurations into it.

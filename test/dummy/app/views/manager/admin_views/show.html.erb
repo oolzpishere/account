@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @manager_admin_view %>
+
+<div>
+  <%= link_to "Edit this admin view", edit_manager_admin_view_path(@manager_admin_view) %> |
+  <%= link_to "Back to admin views", manager_admin_views_path %>
+
+  <%= button_to "Destroy this admin view", @manager_admin_view, method: :delete %>
+</div>

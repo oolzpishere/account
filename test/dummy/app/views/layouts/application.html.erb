@@ -17,7 +17,15 @@
     <% if alert %>
       <p class="alert"><%= alert %></p>
     <% end %>
-    
+
+    <% if current_admin%>
+      <%= button_to "Admin sign out", account.destroy_admin_session_path, method: :delete %>
+    <% end %>
+
+    <% if current_user%>
+      <%= button_to "User sign out", account.destroy_user_session_path, method: :delete %>
+    <% end %>
+
     <%= yield %>
   </body>
 </html>
