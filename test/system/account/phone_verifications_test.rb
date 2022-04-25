@@ -19,7 +19,7 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
     visit "/phone_verification/login"
     fill_in 'phone', with: @user.phone
 
-    params = [@fake_verification_code, Account::PhoneVerificationController::DRIFT_MINUTES.to_s]
+    params = [@fake_verification_code, Account::SendOtpService::DRIFT_MINUTES.to_s]
 
     # Qcloud::Sms.expects(:single_sender).with(@user.phone, @template_code, params).returns(true)
     Qcloud::Sms.stubs(:single_sender).returns(true)
@@ -44,7 +44,7 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
   test "login with right phone, same phone of create_user, right otp" do
     Account::User.any_instance.stubs(:authenticate_otp).returns( true )
     Account::User.any_instance.stubs(:otp_code).returns( @fake_verification_code )
-    params = [@fake_verification_code, Account::PhoneVerificationController::DRIFT_MINUTES.to_s]
+    params = [@fake_verification_code, Account::SendOtpService::DRIFT_MINUTES.to_s]
 
     # mock send sms.
     # Qcloud::Sms.single_sender(phone, @template_code, params)

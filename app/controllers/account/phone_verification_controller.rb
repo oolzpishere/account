@@ -6,8 +6,6 @@ module Account
 
     # default otp-code available for 30 second, drift: 60, is add 60 second more available time.
     # drift 5 minutes.
-    DRIFT_MINUTES = 15
-    DRIFT_SECOND = 60 * DRIFT_MINUTES
     TEMPLATE_CODE = "276826"
 
     def login
@@ -139,7 +137,7 @@ module Account
       end
 
       def compare_otp_erab(user)
-        unless user.authenticate_otp(verification_params[:verification_code], drift: DRIFT_SECOND)
+        unless user.authenticate_otp(verification_params[:verification_code], drift: Account::SendOtpService::DRIFT_SECOND)
           new_status[:error] = '验证码不正确，请重新填写'
           return false
         else
@@ -155,7 +153,7 @@ module Account
           # session["otp_random_secret"] = user.otp_secret_key
 
           result = Account::SendOtpService.new( phone, status, user_params, session: session ).send ? true : false
-          
+
           status[:result] = result
           if Rails.env.test?
             # status[:env_test] = true
