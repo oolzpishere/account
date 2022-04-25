@@ -14,7 +14,7 @@ Account::Engine.routes.draw do
     post :check_verification_code, :controller => "/account/phone_verification", :action => "check_verification_code"
 
     # send_verification_code sms
-    get :send_verification, :controller => "/account/phone_verification", :action => "send_verification"
+    post :send_verification, :controller => "/account/phone_verification", :action => "send_verification"
 
     # wechat login
     match '/auth/:provider/setup' => '/account/wechat#setup', via: [:get]

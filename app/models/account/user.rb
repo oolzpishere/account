@@ -3,7 +3,7 @@ module Account
     include ActiveModel::Validations
     self.table_name = 'users'
     has_many :identifies, dependent: :destroy
-    # gem:active_model_otp
+    # https://github.com/heapsource/active_model_otp
     has_one_time_password
 
     # Include default devise modules. Others available are:

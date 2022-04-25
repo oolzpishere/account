@@ -3,9 +3,12 @@
 <div class="container px-0 pb-3">
 
   <div class="row no-gutters py-2 ">
+    <div class="">
+      登录 / 注册
+    </div>
     <div class="col">
       <%= form_with(scope: "user", url: account.check_verification_code_path, local: true) do |form| %>
-        <%= form.hidden_field :user_action, id: "user_action", value: "login" %>
+        <%# form.hidden_field :user_action, id: "user_action", value: "login" %>
 
         <div id="phone_details" class='form-group'>
           <div class="form-group">
@@ -23,8 +26,9 @@
           <%= link_to '发送验证码', "#", :id=> 'send_verification_code', :class=> 'btn btn-sm btn-success' %>
           <small id="count-down-text" class="text-muted"></small>
         </div>
-
-
+        <%# if(Rails.env.test?) %>
+          <!-- <div id="test-otp-code"></div> -->
+        <%# end %>
         <div id="verification_details" class='form-group' style="display:none;">
           <%= form.label "验证码:", id: 'verify_code_label', class: 'control-label', style:"" %>
           <%= form.text_field :verification_code, placeholder: '请输入验证码', id: 'verification_code' ,:class => "form-control", :alt=> "999999" %>

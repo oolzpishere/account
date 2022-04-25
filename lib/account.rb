@@ -1,5 +1,7 @@
 require "account/engine"
 
+require "account/send_otp_service"
+
 # require 'bootstrap'
 # require 'jquery-rails'
 

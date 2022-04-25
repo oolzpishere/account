@@ -6,7 +6,7 @@ module Account
 
     # default otp-code available for 30 second, drift: 60, is add 60 second more available time.
     # drift 5 minutes.
-    DRIFT_MINUTES = 5
+    DRIFT_MINUTES = 15
     DRIFT_SECOND = 60 * DRIFT_MINUTES
     TEMPLATE_CODE = "276826"
 
@@ -19,67 +19,21 @@ module Account
     end
 
     def create
-      status = {:result => false}
-      phone_num = user_params[:phone]
-      verification_code = verification_params[:verification_code]
-      new_user = new_user_with_session_otp
-
-      unless phone = validate_phone( phone_num )
-        status[:error_message] = "号码格式不正确"
-      end
-
-      if status[:error_message].blank?
-        password = user_params[:password]
-        password_confirmation = user_params[:password_confirmation]
-        unless Devise.secure_compare(password, password_confirmation)
-          status[:error_message] = '密码不匹配，请重新输入'
-        end
-      end
-
-      if status[:error_message].blank?
-        new_user.valid?
-        if new_user.errors.any?
-          status[:error_message] = new_user.errors.full_messages.join(', ')
-        end
-      end
-
-      if status[:error_message].blank?
-        unless new_user.authenticate_otp(verification_code, drift: DRIFT_SECOND)
-          status[:error_message] = '验证码不正确，请重新填写'
-        end
-      end
-
-      if status[:error_message].blank?
-        unless new_user.save
-          status[:error_message] = '用户注册失败'
-        end
-      end
-
-      if status[:error_message]
-        redirect_to( phone_registration_path, alert: status[:error_message] )
-      else
-        sign_in new_user, :event => :authentication, scope: :user
-        redirect_to after_sign_in_path_for(Account::User), notice: '用户注册成功'
-      end
     end
 
     def send_verification
       status = {:result => false}
-      phone_num = params[:phone]
-      user_action = params[:user_action]
+      phone_num = user_params[:phone]
+      # user_action = user_params[:user_action]
 
       unless phone = validate_phone( phone_num )
         status[:error_message] = "号码格式不正确"
       end
 
-      status = if create_user?(user_action)
-        create_user_send_proc(phone_num, status)
-      else
-        login_user_send_proc(phone_num, status)
-      end
+      status = send_otp_service(phone_num, status)
 
       respond_to do |format|
-        format.json  { render :json => status}
+        format.json  { render :json => status }
       end
     end
 
@@ -90,25 +44,29 @@ module Account
 
       unless phone = validate_phone( phone_num )
         redirect_to(phone_login_path, alert: '号码格式不正确')
-        return false
+        return
       end
 
-      unless user = user_find_by_phone(phone)
-        redirect_to(phone_login_path, alert: '此号码未注册用户，请重新填写')
-        return false
+      user = find_or_new_user_erab(phone)
+
+      compare_otp_erab(user) && save_user_erab(user)
+
+      if new_status[:error]
+        redirect_to(phone_login_path, alert: new_status[:error])
+        return
       end
 
-      if user.authenticate_otp(verification_code, drift: DRIFT_SECOND)
-        sign_in user, :event => :authentication, scope: :user
-        redirect_to after_sign_in_path_for(Account::User), notice: '用户登录成功'
-      else
-        redirect_to(phone_login_path, alert: '验证码不正确，请重新填写')
-      end
+      sign_in user, :event => :authentication, scope: :user
+
+      # redirect_to after_sign_in_path_for(Account::User), notice: '用户登录成功'
+      redirect_to "/user/user_views", notice: '用户登录成功'
+
     end
 
     private
       # don't need to use yet.
       def user_params
+        # params.fetch(:user, {}).permit(:phone, :password, :password_confirmation, :user_action)
         params.fetch(:user, {}).permit(:phone, :password, :password_confirmation)
       end
 
@@ -120,8 +78,12 @@ module Account
         account.phone_verification_login_path
       end
 
-      def phone_registration_path
-        account.phone_verification_new_path
+      # def phone_registration_path
+      #   account.phone_verification_new_path
+      # end
+
+      def created_user?(phone)
+        !!user_find_by_phone(phone)
       end
 
       def user_find_by_phone(phone)
@@ -138,54 +100,75 @@ module Account
 
         i = Devise.friendly_token[0,20]
         user.email = "#{i}@sflx.com.cn"
-        user.otp_secret_key = session.delete("otp_random_secret")
+
+        if user.password.blank? && user.password_confirmation.blank?
+          password = Devise.friendly_token[0,20]
+          user.password = password
+          user.password_confirmation = password
+        end
+
+
+        if session["otp_random_secret"]
+          user.otp_secret_key = session.delete("otp_random_secret")
+        else
+          user.otp_secret_key = Account::User.otp_random_secret
+          session["otp_random_secret"] = user.otp_secret_key
+        end
         user
       end
 
-      def create_user?(user_action)
-        user_action && user_action.match("create")
-      end
-
-      def create_user_send_proc(phone, status)
-        if status[:error_message].blank?
-          if user_find_by_phone(phone)
-            status[:error_message] = '此号码已注册，请重新填写'
-          end
-        end
-
-        if status[:error_message].blank?
-          otp_random_secret = Account::User.otp_random_secret
-          session["otp_random_secret"] = otp_random_secret
-
-          result = send_sms( phone, otp_random_secret ) ? true : false
-          status[:result] = result
-        end
-        status
-      end
-
-      def login_user_send_proc(phone, status)
-        if status[:error_message].blank?
-          unless user = user_find_by_phone(phone)
-            status[:error_message] = '此号码未注册用户，请重新填写'
-          end
-        end
-
-        if status[:error_message].blank?
-          result = send_sms( phone, user.otp_code.to_s) ? true : false
-          status[:result] = result
-        end
-        status
-      end
-
-      def send_sms(phone, otp_code, drift = DRIFT_MINUTES.to_s)
-        # 验证码：{1}，此验证码{2}分钟内有效，请尽快完成验证。 提示：请勿泄露验证码给他人
-        params = [otp_code, drift]
-
-        if Qcloud::Sms.single_sender(phone, TEMPLATE_CODE, params)
-          return true
+      def find_or_new_user_erab(phone)
+        user = user_find_by_phone(phone)
+        if user
+          user
         else
+          new_user_with_session_otp
+        end
+      end
+
+      def save_user_erab(user)
+        return user if user.persisted?
+
+        if user.save
+          user
+        else
+          # save user fail.
+          new_status[:error] = '创建用户失败，请重新验证'
           return false
         end
+      end
+
+      def compare_otp_erab(user)
+        unless user.authenticate_otp(verification_params[:verification_code], drift: DRIFT_SECOND)
+          new_status[:error] = '验证码不正确，请重新填写'
+          return false
+        else
+          return true
+        end
+      end
+
+      def send_otp_service(phone, status)
+        if status[:error_message].blank?
+          user = find_or_new_user_erab(phone)
+          # otp_random_secret = Account::User.otp_random_secret
+          # session["otp_random_secret"] = otp_random_secret
+          # session["otp_random_secret"] = user.otp_secret_key
+
+          result = Account::SendOtpService.new( phone, status, user_params, session: session ).send ? true : false
+          
+          status[:result] = result
+          if Rails.env.test?
+            # status[:env_test] = true
+            # status[:test_otp_code] = user.otp_code
+
+            File.write("#{Rails.root}/tmp/test_otp_code", user.otp_code)
+          end
+        end
+        status
+      end
+
+      def new_status
+        @new_status ||= {}
       end
 
   end

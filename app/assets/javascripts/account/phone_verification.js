@@ -17,10 +17,12 @@ ready(() => {
 
   function sendVerificationCodeClickBinding(){
     document.querySelector("#send_verification_code").addEventListener("click", (e) => {
-      var time, seconds, phone_string, user_action;
+      e.preventDefault();
+      e.stopPropagation();
+      var time, seconds;
 
-      phone_string = document.querySelector("#phone").value;
-      user_action = document.querySelector("#user_action").value;
+      var phone_string = document.querySelector("#phone").value;
+      // var user_action = document.querySelector("#user_action").value;
 
       if ( !validatePhone( phone_string ) ) {
         return;
@@ -32,13 +34,22 @@ ready(() => {
       // block phone input and send btn, then send ajax, incase user click send btn multiple times.
       countDown( seconds );
 
-      let send_verification_url = "/send_verification?" + "phone=" + phone_string + "&user_action=" + user_action
-
-      fetch( send_verification_url, {method: 'GET'} ).then(res => {
+      let send_verification_url = "/send_verification?" + "phone=" + phone_string
+      // let send_verification_url = "/send_verification?" + "phone=" + phone_string + "&user_action=" + user_action
+      fetch( "/send_verification", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify( {user: {phone: phone_string} } ) } ).then(res => {
         res.json().then(data => {
           if (data.result === true) {
             page_sty.phoneElemsSuccessSet();
             page_sty.verifyAndSubmitElemsShow();
+
+            // if (data.env_test) {
+            //   document.querySelector("#test-otp-code").textContent = data.test_otp_code
+            // }
           } else {
             // error_message = "problem_sending_sms";
             page_sty.phoneElemsFailSet(data.error_message)
