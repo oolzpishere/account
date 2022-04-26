@@ -41,7 +41,7 @@ ready(() => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify( {user: {phone: phone_string} } ) } ).then(res => {
+        body: JSON.stringify( {phone: {phone: phone_string} } ) } ).then(res => {
         res.json().then(data => {
           if (data.result === true) {
             page_sty.phoneElemsSuccessSet();

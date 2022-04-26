@@ -21,8 +21,8 @@ module Account
 
     def send_verification
       status = {:result => false}
-      phone_num = user_params[:phone]
-      # user_action = user_params[:user_action]
+      phone_num = phone_params[:phone]
+      # user_action = phone_params[:user_action]
 
       unless phone = validate_phone( phone_num )
         status[:error_message] = "号码格式不正确"
@@ -37,11 +37,11 @@ module Account
 
     def check_verification_code
       #d data = {:result => false}
-      phone_num = user_params[:phone]
+      phone_num = phone_params[:phone]
       verification_code = verification_params[:verification_code]
 
       unless phone = validate_phone( phone_num )
-        redirect_to(phone_login_path, alert: '号码格式不正确')
+        redirect_to(account.user_session_path, alert: '号码格式不正确')
         return
       end
 
@@ -50,7 +50,7 @@ module Account
       compare_otp_erab(user) && save_user_erab(user)
 
       if new_status[:error]
-        redirect_to(phone_login_path, alert: new_status[:error])
+        redirect_to(account.user_session_path, alert: new_status[:error])
         return
       end
 
@@ -63,13 +63,13 @@ module Account
 
     private
       # don't need to use yet.
-      def user_params
+      def phone_params
         # params.fetch(:user, {}).permit(:phone, :password, :password_confirmation, :user_action)
-        params.fetch(:user, {}).permit(:phone, :password, :password_confirmation)
+        params.fetch(:phone, {}).permit(:phone, :password, :password_confirmation)
       end
 
       def verification_params
-        params.fetch(:user, {}).permit(:verification_code)
+        params.fetch(:phone, {}).permit(:verification_code)
       end
 
       def phone_login_path
@@ -94,7 +94,7 @@ module Account
 
       def new_user_with_session_otp
         # return nil, if create! fail
-        user = Account::User.new(user_params)
+        user = Account::User.new(phone_params)
 
         i = Devise.friendly_token[0,20]
         user.email = "#{i}@sflx.com.cn"
@@ -147,20 +147,15 @@ module Account
 
       def send_otp_service(phone, status)
         if status[:error_message].blank?
-          user = find_or_new_user_erab(phone)
+          # user = find_or_new_user_erab(phone)
           # otp_random_secret = Account::User.otp_random_secret
           # session["otp_random_secret"] = otp_random_secret
           # session["otp_random_secret"] = user.otp_secret_key
 
-          result = Account::SendOtpService.new( phone, status, user_params, session: session ).send ? true : false
+          result = Account::SendOtpService.new( phone, status, phone_params, session: session ).send ? true : false
 
           status[:result] = result
-          if Rails.env.test?
-            # status[:env_test] = true
-            # status[:test_otp_code] = user.otp_code
 
-            File.write("#{Rails.root}/tmp/test_otp_code", user.otp_code)
-          end
         end
         status
       end

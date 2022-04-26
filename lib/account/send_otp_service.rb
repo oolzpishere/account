@@ -47,6 +47,8 @@ module Account
       # 验证码：{1}，此验证码{2}分钟内有效，请尽快完成验证。 提示：请勿泄露验证码给他人
       params = [otp_code, drift]
 
+      return if Rails.env.development?
+
       if Qcloud::Sms.single_sender(phone, TEMPLATE_CODE, params)
         return true
       else

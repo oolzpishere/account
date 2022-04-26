@@ -15,9 +15,16 @@ require 'qcloud/sms'
 require 'aliyun/sms'
 
 module Account
-
+  
   class<< self
-    attr_accessor :login_corp_name
+    attr_accessor :login_corp_name, :phone_login, :wechat_login
+
+    @phone_login = true
+    @wechat_login = true
+
+    def setup
+      yield self
+    end
 
   end
 

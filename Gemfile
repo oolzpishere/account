@@ -40,8 +40,8 @@ group :development, :test do
   # gem 'rails-controller-testing'
   gem 'faker'
 
-  # gem 'awesome_print'
-  # gem 'better_errors'
+  gem 'awesome_print'
+  gem 'better_errors'
 
   gem 'tapping_device'
 end

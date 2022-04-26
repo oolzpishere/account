@@ -1,0 +1,48 @@
+<h2> Phone login </h2>
+
+<div class="container px-0 pb-3">
+
+  <div class="row no-gutters py-2 ">
+    <div class="">
+      登录 / 注册
+    </div>
+    <div class="col">
+      <%= form_with( scope: :phone, url: account.check_verification_code_path, local: true) do |form| %>
+        <%# form.hidden_field :user_action, id: "user_action", value: "login" %>
+
+        <div id="phone_details" class='form-group'>
+          <div class="form-group">
+            <%= form.label "手机号:", class: 'control-label', id: 'verify_phone_label' %>
+            <%= form.text_field :phone, id: 'phone' ,:class => "form-control", placeholder: '请输入您的手机号' %>
+            <small id="passwordHelpBlock" class="form-text text-muted col-12">
+              请输入11位数字手机号
+            </small>
+            <%= form.label "", class: 'control-label invalid-feedback', id: 'error_mobile_label', style:"display:none;" %>
+
+          </div>
+        </div>
+
+        <div class="form-group">
+          <%= link_to '发送验证码', "#", :id=> 'send_verification_code', :class=> 'btn btn-sm btn-success' %>
+          <small id="count-down-text" class="text-muted"></small>
+        </div>
+        <%# if(Rails.env.test?) %>
+          <!-- <div id="test-otp-code"></div> -->
+        <%# end %>
+        <div id="verification_details" class='form-group' style="display:none;">
+          <%= form.label "验证码:", id: 'verify_code_label', class: 'control-label', style:"" %>
+          <%= form.text_field :verification_code, placeholder: '请输入验证码', id: 'verification_code' ,:class => "form-control", :alt=> "999999" %>
+          <%= form.label "请输入6位数字验证码", class: 'control-label', id: 'error_code_label', style:"display:none;" %>
+          <%= form.label "", class: 'control-label', id: 'success_code_label' %>
+        </div>
+
+        <div id="submit_verification_btn" class="actions"  style="display:none;">
+          <%= form.submit "登录 / 注册", class: "btn btn-primary"%>
+        </div>
+      <% end %>
+    </div>
+
+
+  </div>
+
+</div>

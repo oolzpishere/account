@@ -23,6 +23,13 @@
   </div>
 <% end %>
 
-<%= link_to "微信登录", "/auth/wechat", form_class: "", method: :post %>
+<% if Account.phone_login %>
+  <%= render "phone_sessions" %>
+<% end %>
+
+<% if Account.wechat_login %>
+  <h2> wechat login </h2>
+  <%= link_to "微信登录", "/auth/wechat", form_class: "", method: :post %>
+<% end %>
 
 <%= render "users/shared/links" %>
