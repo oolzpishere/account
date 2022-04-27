@@ -1,8 +1,8 @@
 require "application_system_test_case"
 
-class PhoneVerificationsTest < ApplicationSystemTestCase
+class UsersPhoneVerificationsTest < ApplicationSystemTestCase
   def setup
-    @user = new_user
+    @user = create_user
     @template_code = "276826"
     @phone = @user.phone
     @fake_verification_code = '123456'
@@ -25,20 +25,14 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
     Qcloud::Sms.stubs(:single_sender).returns(true)
     click_link '发送验证码'
 
-    # puts page.evaluate_script("document.querySelector('#verify_phone_label').textContent;")
-    # test_otp_code =  page.evaluate_script("document.querySelector('#test-otp-code').textContent;")
-    test_otp_code_path = "#{Rails.root}/tmp/test_otp_code"
-    if File.exist?(test_otp_code_path)
-      test_otp_code =  File.read( test_otp_code_path )
-      File.delete( test_otp_code_path )
-    end
+    test_otp_code = @user.otp_code
 
     assert find('#send_verification_code', class: 'disabled')
 
     fill_in 'verification_code', with: test_otp_code
 
     click_button '登录 / 注册'
-    # assert_content '用户登录成功'
+    assert_content '用户登录成功'
   end
 
   test "login with right phone, same phone of create_user, right otp" do
@@ -60,7 +54,7 @@ class PhoneVerificationsTest < ApplicationSystemTestCase
     # countDown test
     assert_content '再次发送验证码'
     assert find('#send_verification_code', class: 'disabled')
-
+    
     using_wait_time 5 do
       fill_in 'verification_code', with: @fake_verification_code
     end

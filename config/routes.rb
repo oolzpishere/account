@@ -24,4 +24,11 @@ Account::Engine.routes.draw do
     get "/auth/wechat/callback", :controller => "/account/wechat", action: "wechat_base", :constraints => lambda { |request| request.params[:scope] == "snsapi_base" }
   end
 
+  # resources :users
+  get '/users', to: 'users#index'
+  get '/users/:id', to: 'users#show'
+  get '/users/:id/edit', to: 'users#edit'
+  patch '/users/:id', to: 'users#update'
+  put '/users/:id', to: 'users#update'
+
 end

@@ -2,7 +2,7 @@ module Account
   class SendOtpService
     DRIFT_MINUTES = 15
     DRIFT_SECOND = 60 * DRIFT_MINUTES
-    TEMPLATE_CODE = "276826"
+    # TEMPLATE_CODE = "276826"
     
     attr_reader :phone, :session, :status, :user_params
     def initialize(phone, status, user_params, session: nil)
@@ -18,9 +18,7 @@ module Account
 
       result = send_sms( phone, user.otp_code ) ? true : false
       status[:result] = result
-      if Rails.env.test?
-        File.write("#{Rails.root}/tmp/test_otp_code", user.otp_code)
-      end
+
       status
     end
 
@@ -47,9 +45,12 @@ module Account
       # 验证码：{1}，此验证码{2}分钟内有效，请尽快完成验证。 提示：请勿泄露验证码给他人
       params = [otp_code, drift]
 
-      return if Rails.env.development?
-
-      if Qcloud::Sms.single_sender(phone, TEMPLATE_CODE, params)
+      if Rails.env.development?
+        Rails.logger.info "!!send_sms: #{phone}, #{params.join(', ')}"
+        return
+      end
+      
+      if Qcloud::Sms.single_sender(phone, Account.verify_template_code, params)
         return true
       else
         return false

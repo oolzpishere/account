@@ -6,7 +6,6 @@ module Account
 
     # default otp-code available for 30 second, drift: 60, is add 60 second more available time.
     # drift 5 minutes.
-    TEMPLATE_CODE = "276826"
 
     def login
 
