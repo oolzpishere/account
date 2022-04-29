@@ -4,32 +4,29 @@ module Account
     DRIFT_SECOND = 60 * DRIFT_MINUTES
     # TEMPLATE_CODE = "276826"
     
-    attr_reader :phone, :session, :status, :user_params
-    def initialize(phone, status, user_params, session: nil)
+    attr_reader :phone, :session, :notifier, :user_params
+    def initialize(phone, notifier, user_params, session: nil)
       @phone = phone
       @session = session
-      @status = status
+      @notifier = notifier
       @user_params = user_params
     end
 
     def send
-      user = find_or_new_user
-      return if user.blank?
+      user = find_or_create_user
+      raise 'find_or_create_user fail.' if user.blank?
 
-      result = send_sms( phone, user.otp_code ) ? true : false
-      status[:result] = result
-
-      status
+      send_sms( phone, user.otp_code )
     end
 
     private
 
-    def find_or_new_user
+    def find_or_create_user
       user = user_find_by_phone(phone)
       if user
         user
       else
-        new_user
+        create_user
       end
     end
 
@@ -53,11 +50,12 @@ module Account
       if Qcloud::Sms.single_sender(phone, Account.verify_template_code, params)
         return true
       else
+        notifier.add_error(:send_sms_fail, "发送验证码失败，请点击重新发送")
         return false
       end
     end
 
-    def new_user
+    def create_user
       # return nil, if create! fail
       user = Account::User.new(user_params)
 
@@ -73,33 +71,13 @@ module Account
       if user.save
         user
       else
+        # report to developer
+        # return to this action starting point and tell user to try again.
+        notifier.add_error(:create_user_fail, "创建用户失败，请重新注册")
         false
       end
     end
 
-    # def new_user_with_session_otp
-    #   # return nil, if create! fail
-    #   user = Account::User.new(user_params)
-
-    #   i = Devise.friendly_token[0,20]
-    #   user.email = "#{i}@sflx.com.cn"
-
-    #   if user.password.blank? && user.password_confirmation.blank?
-    #     password = Devise.friendly_token[0,20]
-    #     user.password = password
-    #     user.password_confirmation = password
-    #   end
-
-    #   if session && session["otp_random_secret"]
-    #     user.otp_secret_key = session.delete("otp_random_secret")
-    #   else
-    #     user.otp_secret_key = Account::User.otp_random_secret
-    #     session["otp_random_secret"] = user.otp_secret_key
-    #   end
-    #   user
-    # end
-
-    
 
   end
 end

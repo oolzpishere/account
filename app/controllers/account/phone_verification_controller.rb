@@ -19,18 +19,20 @@ module Account
     end
 
     def send_verification
-      status = {:result => false}
+      notifier = Account::Notifier.new
+
       phone_num = phone_params[:phone]
       # user_action = phone_params[:user_action]
 
       unless phone = validate_phone( phone_num )
-        status[:error_message] = "号码格式不正确"
+        notifier.add_error(:invalid_phone_number, '号码格式不正确')
       end
 
-      status = send_otp_service(phone_num, status)
-
+      result = send_otp_service(phone_num, notifier)
+      error_message = notifier.full_messages
+      
       respond_to do |format|
-        format.json  { render :json => status }
+        format.json  { render :json => {result: result, error_message: error_message} }
       end
     end
 
@@ -144,19 +146,9 @@ module Account
         end
       end
 
-      def send_otp_service(phone, status)
-        if status[:error_message].blank?
-          # user = find_or_new_user_erab(phone)
-          # otp_random_secret = Account::User.otp_random_secret
-          # session["otp_random_secret"] = otp_random_secret
-          # session["otp_random_secret"] = user.otp_secret_key
-
-          result = Account::SendOtpService.new( phone, status, phone_params, session: session ).send ? true : false
-
-          status[:result] = result
-
-        end
-        status
+      def send_otp_service(phone, notifier)
+        return false if notifier.any_error?
+        Account::SendOtpService.new( phone, notifier, phone_params, session: session ).send
       end
 
       def new_status
