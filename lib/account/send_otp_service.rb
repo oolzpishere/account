@@ -44,7 +44,7 @@ module Account
 
       if Rails.env.development?
         Rails.logger.info "!!send_sms: #{phone}, #{params.join(', ')}"
-        return
+        return true
       end
       
       if Qcloud::Sms.single_sender(phone, Account.verify_template_code, params)
@@ -56,7 +56,6 @@ module Account
     end
 
     def create_user
-      # return nil, if create! fail
       user = Account::User.new(user_params)
 
       i = Devise.friendly_token[0,20]
@@ -71,8 +70,7 @@ module Account
       if user.save
         user
       else
-        # report to developer
-        # return to this action starting point and tell user to try again.
+        # report to developer and set return message. 
         notifier.add_error(:create_user_fail, "创建用户失败，请重新注册")
         false
       end

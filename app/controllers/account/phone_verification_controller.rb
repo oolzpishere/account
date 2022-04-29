@@ -29,36 +29,31 @@ module Account
       end
 
       result = send_otp_service(phone_num, notifier)
-      error_message = notifier.full_messages
       
       respond_to do |format|
-        format.json  { render :json => {result: result, error_message: error_message} }
+        format.json  { render :json => { result: result, error_message: notifier.full_messages } }
       end
     end
 
     def check_verification_code
-      #d data = {:result => false}
       phone_num = phone_params[:phone]
       verification_code = verification_params[:verification_code]
 
       unless phone = validate_phone( phone_num )
-        redirect_to(account.user_session_path, alert: '号码格式不正确')
+        redirect_to( account.user_session_path, alert: '号码格式不正确' )
         return
       end
 
-      user = find_or_new_user_erab(phone)
-
-      compare_otp_erab(user) && save_user_erab(user)
-
-      if new_status[:error]
-        redirect_to(account.user_session_path, alert: new_status[:error])
+      user = user_find_by_phone(phone)
+      unless user.authenticate_otp( verification_code, drift: Account::SendOtpService::DRIFT_SECOND )
+        redirect_to( account.user_session_path, alert: '验证码不正确，请重新填写' )
         return
       end
 
       sign_in user, :event => :authentication, scope: :user
 
       # redirect_to after_sign_in_path_for(Account::User), notice: '用户登录成功'
-      redirect_to "/user/user_views", notice: '用户登录成功'
+      redirect_to "/users", notice: '用户登录成功'
 
     end
 
@@ -76,10 +71,6 @@ module Account
       def phone_login_path
         account.phone_verification_login_path
       end
-
-      # def phone_registration_path
-      #   account.phone_verification_new_path
-      # end
 
       def created_user?(phone)
         !!user_find_by_phone(phone)
@@ -105,7 +96,6 @@ module Account
           user.password = password
           user.password_confirmation = password
         end
-
 
         if session["otp_random_secret"]
           user.otp_secret_key = session.delete("otp_random_secret")

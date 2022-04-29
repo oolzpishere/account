@@ -103,7 +103,7 @@ class UsersPhoneVerificationsTest < ApplicationSystemTestCase
 
     fill_in 'verification_code', with: wrong_verification_code
     click_button '登录 / 注册'
-
+    
     assert_content '验证码不正确，请重新填写'
   end
 
