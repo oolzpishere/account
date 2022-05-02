@@ -95,7 +95,7 @@ module Account
         password: i,                                              # 密码随机
         password_confirmation: i
       )
-      byebug
+      
       unless new_user.save
         # TODO: redirect_to login_path || root_path
         redirect_to(login_path, alert: "user保存错误, error: #{new_user.errors.full_messages}")
