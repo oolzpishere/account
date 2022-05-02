@@ -18,7 +18,7 @@ Account::Engine.routes.draw do
     post :send_verification, :controller => "/account/phone_verification", :action => "send_verification"
 
     # wechat login
-    match '/auth/:provider/setup' => '/account/wechat#setup', via: [:get]
+    # match '/auth/:provider/setup' => '/account/wechat#setup', via: [:get]
     # eg: get "/auth/:action/callback", :controller => "authentications", :constraints => { :action => /wechat|google/ }
     get "/auth/wechat/callback", :controller => "/account/wechat", action: "wechat", :constraints => lambda { |request| request.params[:scope].blank? }
     get "/auth/wechat/callback", :controller => "/account/wechat", action: "wechat_base", :constraints => lambda { |request| request.params[:scope] == "snsapi_base" }

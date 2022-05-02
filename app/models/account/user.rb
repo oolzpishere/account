@@ -18,8 +18,8 @@ module Account
     end
 
     validates :email, uniqueness: { case_sensitive: false }, allow_nil: true, allow_blank: true
-    validates :phone, uniqueness: true, allow_nil: true, allow_blank: true
-    validates_format_of :phone, with: /\A[0-9+_-]+\z/
+    validates :phone, uniqueness: true, allow_nil: true, allow_blank: true, format: { with: /\A\d{11}\z/, on: :create }
+    # validates_format_of :phone, with: /\A[0-9+_-]+\z/, allow_nil: true, allow_blank: true
     # https://github.com/heartcombo/devise/wiki/How-To:-Allow-users-to-sign-in-using-their-username-or-email-address
     def phone?
      !phone.blank?

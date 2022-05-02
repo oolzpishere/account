@@ -27,9 +27,11 @@
   <%= render "phone_sessions" %>
 <% end %>
 
+
 <% if Account.wechat_login %>
   <h2> wechat login </h2>
-  <%= link_to "微信登录", "/auth/wechat", form_class: "", method: :post %>
+  <%= link_to "微信登录-link", "https://sflx.com.cn/get-weixin-code.html?appid=#{"wx70ec68024167dffd"}&redirect_uri=#{request.original_url}&response_type=code&scope=snsapi_base" %>
+  <%= button_to "微信登录", "/auth/wechat", form_class: "", method: :post %>
 <% end %>
 
 <%= render "users/shared/links" %>

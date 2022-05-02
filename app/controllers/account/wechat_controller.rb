@@ -4,17 +4,15 @@ module Account
     # skip_before_action :verify_authenticity_token, only: :wechat
     # skip_before_action :authenticate_user!
     # not authenticate_user! when callback to wechat.
-
-    # before_action :get_info, only: [:wechat]
-    # set class vars after get_info success.
+    OmniAuth.config.request_validation_phase = Account::TokenVerifier.new
     attr_reader :auth_info, :wechat_user_info, :raw_info, :provider, :openid , :unionid
 
-    def setup
-      if (scope = params["scope"]) && scope.match("snsapi_base")
-        request.env['omniauth.strategy'].options[:authorize_params][:scope]="snsapi_base"
-      end
-      render :plain => "Omniauth setup phase.", :status => 404
-    end
+    # def setup
+    #   if (scope = params["scope"]) && scope.match("snsapi_base")
+    #     request.env['omniauth.strategy'].options[:authorize_params][:scope] = "snsapi_base"
+    #   end
+    #   render :plain => "Omniauth setup phase.", :status => 404
+    # end
 
     def wechat
       # if (scope = params["scope"]) && scope.match("snsapi_base")
@@ -27,7 +25,7 @@ module Account
       @provider = auth_info.provider
       @openid = auth_info.uid
       @unionid = raw_info["unionid"] ? raw_info["unionid"] : ""
-
+      
       if identify = find_identify
         # exist, get user data from db.
         @user = identify.user
@@ -36,7 +34,6 @@ module Account
         @user = create_user_and_identify
         return false unless @user
       end
-
       # sign_in_and_redirect @user, :event => :authentication
       sign_in @user, :event => :authentication, scope: :user
       # TODO: consider how to add this setting to difference App.
@@ -98,9 +95,10 @@ module Account
         password: i,                                              # 密码随机
         password_confirmation: i
       )
+      byebug
       unless new_user.save
         # TODO: redirect_to login_path || root_path
-        redirect_to(login_path, alert: 'user保存错误')
+        redirect_to(login_path, alert: "user保存错误, error: #{new_user.errors.full_messages}")
         return false
       end
       return false unless create_identify(new_user)
