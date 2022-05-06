@@ -24,7 +24,7 @@ module Account
       @raw_info = auth_info.extra[:raw_info]
       @provider = auth_info.provider
       @openid = auth_info.uid
-      @unionid = raw_info["unionid"] ? raw_info["unionid"] : ""
+      @unionid = raw_info["unionid"].blank? ? nil : raw_info["unionid"]
       
       if identify = find_identify
         # exist, get user data from db.
