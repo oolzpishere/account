@@ -3,7 +3,7 @@ Account::Engine.routes.draw do
   if Account::Engine.custom_routes && (Account::Engine.custom_routes == true)
     # class_eval(Account::Engine.custom_routes_draw)
   else
-    devise_for :users, module: 'devise', class_name: "Account::User"
+    devise_for :users, module: 'devise', class_name: "Account::User", controllers: { sessions: 'users/sessions' }
     devise_for :admins, module: 'devise', class_name: "Account::Admin"
 
     # for create account
@@ -22,6 +22,8 @@ Account::Engine.routes.draw do
     # eg: get "/auth/:action/callback", :controller => "authentications", :constraints => { :action => /wechat|google/ }
     get "/auth/wechat/callback", :controller => "/account/wechat", action: "wechat", :constraints => lambda { |request| request.params[:scope].blank? }
     get "/auth/wechat/callback", :controller => "/account/wechat", action: "wechat_base", :constraints => lambda { |request| request.params[:scope] == "snsapi_base" }
+    get "/auth/open_wechat/callback", :controller => "/account/wechat", action: "open_wechat"
+    get "/auth/open_wechat/redirect", :controller => "/account/wechat", action: "open_wechat_redirect"
   end
 
   # resources :users

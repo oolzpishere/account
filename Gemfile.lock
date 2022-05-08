@@ -1,7 +1,15 @@
+GIT
+  remote: https://github.com/oolzpishere/omniauth-open-wechat-oauth2
+  revision: 0b8672815603b6cd0b44b24d39a267b32ca40952
+  specs:
+    omniauth-open-wechat-oauth2 (1.0.3)
+      omniauth (~> 2.0)
+      omniauth-oauth2 (~> 1.0)
+
 PATH
   remote: .
   specs:
-    account (0.2.4)
+    account (0.2.5)
       active_model_otp
       aliyun-sms
       devise
@@ -296,6 +304,7 @@ DEPENDENCIES
   factory_bot_rails
   faker
   mocha
+  omniauth-open-wechat-oauth2!
   pry
   puma (~> 5.5)
   selenium-webdriver

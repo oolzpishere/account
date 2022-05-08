@@ -45,3 +45,5 @@ group :development, :test do
 
   gem 'tapping_device'
 end
+
+gem 'omniauth-open-wechat-oauth2', git: 'https://github.com/oolzpishere/omniauth-open-wechat-oauth2'

@@ -4,7 +4,8 @@ module Account
     # skip_before_action :verify_authenticity_token, only: :wechat
     # skip_before_action :authenticate_user!
     # not authenticate_user! when callback to wechat.
-    OmniAuth.config.request_validation_phase = Account::TokenVerifier.new
+
+    # OmniAuth.config.request_validation_phase = Account::TokenVerifier.new
     attr_reader :auth_info, :wechat_user_info, :raw_info, :provider, :openid , :unionid
 
     # def setup
@@ -25,7 +26,7 @@ module Account
       @provider = auth_info.provider
       @openid = auth_info.uid
       @unionid = raw_info["unionid"].blank? ? nil : raw_info["unionid"]
-      
+       
       if identify = find_identify
         # exist, get user data from db.
         @user = identify.user
@@ -40,6 +41,34 @@ module Account
       # 1. Add to initialze config file.
       # TODO: redirect to session[devise_after_sign_in] || user home page.
       redirect_to after_sign_in_path_for(Account::User)
+    end
+
+    def open_wechat
+      get_info
+      @wechat_user_info = auth_info.info  
+      @raw_info = auth_info.extra[:raw_info]
+      @provider = auth_info.provider
+      @unionid = raw_info["unionid"].blank? ? nil : raw_info["unionid"]
+
+      if identify = find_identify
+        # exist, get user data from db.
+        @user = identify.user
+      else
+        # not exist, create user.
+        @user = create_user_and_identify
+        return false unless @user
+      end
+      # sign_in_and_redirect @user, :event => :authentication
+      sign_in @user, :event => :authentication, scope: :user
+      # TODO: consider how to add this setting to difference App.
+      # TODO: redirect to session[devise_after_sign_in] || user home page.
+      redirect_to after_sign_in_path_for(Account::User)
+    end
+
+    def open_wechat_redirect
+      uri = URI(request.original_url)
+      uri.path = "/auth/open_wechat/callback"
+      @open_wechat_callback_url = uri.to_s
     end
 
     def wechat_base
@@ -108,7 +137,7 @@ module Account
     def create_identify(user)
       identify = Account::Identify.new(
         provider: auth_info.provider,
-        uid: auth_info.uid,
+        uid: raw_info["openid"],
         unionid: unionid,
         user_id: user.id
       )
