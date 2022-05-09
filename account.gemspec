@@ -38,7 +38,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'active_model_otp'
 
   spec.add_dependency "omniauth"
-  spec.add_dependency "omniauth-wechat-oauth2"
+  # spec.add_dependency "omniauth-wechat-oauth2"
   spec.add_dependency "omniauth-rails_csrf_protection"
   spec.add_dependency 'qcloud-sms', "~> 1.0.1"
   spec.add_dependency 'aliyun-sms'

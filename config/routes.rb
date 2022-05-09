@@ -18,12 +18,17 @@ Account::Engine.routes.draw do
     post :send_verification, :controller => "/account/phone_verification", :action => "send_verification"
 
     # wechat login
-    # match '/auth/:provider/setup' => '/account/wechat#setup', via: [:get]
-    # eg: get "/auth/:action/callback", :controller => "authentications", :constraints => { :action => /wechat|google/ }
-    get "/auth/wechat/callback", :controller => "/account/wechat", action: "wechat", :constraints => lambda { |request| request.params[:scope].blank? }
-    get "/auth/wechat/callback", :controller => "/account/wechat", action: "wechat_base", :constraints => lambda { |request| request.params[:scope] == "snsapi_base" }
-    get "/auth/open_wechat/callback", :controller => "/account/wechat", action: "open_wechat"
-    get "/auth/open_wechat/redirect", :controller => "/account/wechat", action: "open_wechat_redirect"
+    if Account.omniauth_wechat
+      # match '/auth/:provider/setup' => '/account/wechat#setup', via: [:get]
+      # eg: get "/auth/:action/callback", :controller => "authentications", :constraints => { :action => /wechat|google/ }
+      get "/auth/wechat/callback", :controller => "/account/wechat", action: "wechat", :constraints => lambda { |request| request.params[:scope].blank? }
+      get "/auth/wechat/callback", :controller => "/account/wechat", action: "wechat_base", :constraints => lambda { |request| request.params[:scope] == "snsapi_base" }
+    end
+
+    if Account.omniauth_open_wechat
+      get "/auth/open_wechat/callback", :controller => "/account/wechat", action: "open_wechat"
+      get "/auth/open_wechat/redirect", :controller => "/account/wechat", action: "open_wechat_redirect"
+    end
   end
 
   # resources :users

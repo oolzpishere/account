@@ -1,7 +1,7 @@
 Rails.application.config.middleware.use OmniAuth::Builder do
-  provider :wechat, ENV["SFLX_WECHAT_OPEN_ID"], ENV["SFLX_WECHAT_OPEN_SE"],
+  provider :wechat, ENV["SFLX_APPID"], ENV["SFLX_APP_SECRET"],
       # :authorize_params => {:scope => "snsapi_userinfo"},
-      :client_options => {authorize_url: "https://www.sflx.com.cn/get-weixin-code.html"}
+      :client_options => {authorize_url: "https://sflx.com.cn/get-weixin-code.html"}
   
   provider :open_wechat, ENV["SFLX_WECHAT_OPEN_ID"], ENV["SFLX_WECHAT_OPEN_SE"]
   # if you want to skip CORS verification, uncomment this line:

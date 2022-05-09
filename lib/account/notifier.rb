@@ -17,6 +17,13 @@ module Account
       !messages.blank?
     end
 
+    # @key: symbol, key word.
+    # @message: string, message.
+    # eg:
+    #   @messages=
+    #   {:first_name=>["First Name is required."],
+    #    :contact_number=>["Contact number is not a number."]
+    #   }>
     def add_error(key, message)
       messages[key] = message
       Rails.logger.error "error: #{key.to_s}: #{message}"

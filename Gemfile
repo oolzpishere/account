@@ -47,3 +47,4 @@ group :development, :test do
 end
 
 gem 'omniauth-open-wechat-oauth2', git: 'https://github.com/oolzpishere/omniauth-open-wechat-oauth2'
+gem "omniauth-wechat-oauth2", git: 'git@github.com:oolzpishere/omniauth-wechat-oauth2.git'

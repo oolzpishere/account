@@ -26,8 +26,11 @@ module Account
   mattr_accessor :phone_login
   @@phone_login = true
 
-  mattr_accessor :wechat_login
-  @@wechat_login = true
+  mattr_accessor :omniauth_wechat
+  @@omniauth_wechat = true
+
+  mattr_accessor :omniauth_open_wechat
+  @@omniauth_open_wechat = true
 
   mattr_accessor :verify_template_code
   @@verify_template_code = "276826"

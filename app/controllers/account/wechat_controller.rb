@@ -50,14 +50,9 @@ module Account
       @provider = auth_info.provider
       @unionid = raw_info["unionid"].blank? ? nil : raw_info["unionid"]
 
-      if identify = find_identify
-        # exist, get user data from db.
-        @user = identify.user
-      else
-        # not exist, create user.
-        @user = create_user_and_identify
-        return false unless @user
-      end
+      identify = find_or_create_identify
+      return false if notifier.any_error?
+      
       # sign_in_and_redirect @user, :event => :authentication
       sign_in @user, :event => :authentication, scope: :user
       # TODO: consider how to add this setting to difference App.
@@ -85,6 +80,10 @@ module Account
 
     private
 
+    def notifier
+      @notifier ||= Account::Notifier.new
+    end
+
     def login_path
       account.new_user_session_path
     end
@@ -95,6 +94,20 @@ module Account
       else
         # TODO: get omniauth.auth fail, return to login page
         redirect_to(login_path, alert: 'omniauth.auth wechat未返回正确数据')
+        return false
+      end
+    end
+
+    def find_or_create_identify
+      if identify = find_identify
+        # exist, get user data from db.
+        @user = identify.user
+      else
+        # not exist, create user.
+        @user = create_user_and_identify
+      end
+      if @user.blank?
+        notifier.add_error :find_or_create_identify, "find_or_create_identify fail."
         return false
       end
     end

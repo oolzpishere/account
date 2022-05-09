@@ -30,13 +30,16 @@
 <% end %>
 
 
-<% if Account.wechat_login %>
+<% if Account.omniauth_wechat %>
   <h2> wechat login </h2>
   <%# link_to "微信登录-link", "https://sflx.com.cn/get-weixin-code.html?appid=#{"wx70ec68024167dffd"}&redirect_uri=#{request.original_url}&response_type=code&scope=snsapi_base" %>
   <%= button_to "微信登录", "/auth/wechat", form_class: "", method: :post %>
 <% end %>
 
-<div id="login_container" data-state=<%= session["omniauth.state"] %> >
-</div>
+<% if Account.omniauth_open_wechat %>
+  <h2> Open wechat login </h2>
+  <div id="login_container" data-state=<%= session["omniauth.state"] %> >
+  </div>
+<% end %>
 
 <%= render "users/shared/links" %>
