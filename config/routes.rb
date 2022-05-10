@@ -32,10 +32,10 @@ Account::Engine.routes.draw do
   end
 
   # https://github.com/heartcombo/devise/wiki/How-To:-Customize-the-redirect-after-a-user-edits-their-profile
-  get '/users', to: 'users#index', :as => :user_root
-  get '/users/:id', to: 'users#show'
-  get '/users/:id/edit', to: 'users#edit'
-  patch '/users/:id', to: 'users#update'
-  put '/users/:id', to: 'users#update'
+  # get '/users', to: 'users#index', :as => :user_root
+  # get '/users/:id', to: 'users#show'
+  # get '/users/:id/edit', to: 'users#edit'
+  # patch '/users/:id', to: 'users#update'
+  # put '/users/:id', to: 'users#update'
 
 end
