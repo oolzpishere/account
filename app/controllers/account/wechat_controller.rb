@@ -57,7 +57,8 @@ module Account
       sign_in @user, :event => :authentication, scope: :user
       # TODO: consider how to add this setting to difference App.
       # TODO: redirect to session[devise_after_sign_in] || user home page.
-      redirect_to after_sign_in_path_for(Account::User)
+      # redirect_to after_sign_in_path_for(Account::User)
+      redirect_to main_app.user_root_path
     end
 
     def open_wechat_redirect

@@ -17,7 +17,7 @@ GIT
 PATH
   remote: .
   specs:
-    account (0.2.7)
+    account (0.2.10)
       active_model_otp
       aliyun-sms
       devise
@@ -268,7 +268,7 @@ GEM
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
     sqlite3 (1.4.2)
-    strscan (3.0.1)
+    strscan (3.0.2)
     tapping_device (0.6.1)
       method_source (~> 1.0.0)
       pastel (~> 0.7)
