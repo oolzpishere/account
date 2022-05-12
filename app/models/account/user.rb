@@ -16,6 +16,10 @@ module Account
     def must_have_one
      errors.add(:base, 'Must have phone or email') unless (phone? || email?)
     end
+    
+    def self.configure
+      yield self
+    end
 
     validates :email, uniqueness: { case_sensitive: false }, allow_nil: true, allow_blank: true
     validates :phone, uniqueness: true, allow_nil: true, allow_blank: true, format: { with: /\A\d{11}\z/, on: :create }
