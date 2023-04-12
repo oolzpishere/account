@@ -17,6 +17,12 @@ gem 'account'
 mount Account::Engine   => '/', as: 'account'
 ```
 
+Add admin_root or user_root in app/config/routes.rb, for redirection after login.
+eg:
+```
+  get '/manager/conferences', to: 'admin/manager/conferences#index', :as => :admin_root
+```
+
 3. for wechat omniauth
 copy template/omniauth.rb to your application: config/initializer/omniauth.rb.
 

@@ -11,5 +11,9 @@ module Account
              :recoverable, :rememberable, :validatable
     end
 
+    def admin_role?
+      !role.blank? && role == 'admin'
+    end
+
   end
 end
